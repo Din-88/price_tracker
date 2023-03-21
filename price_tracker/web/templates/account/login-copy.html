@@ -1,0 +1,196 @@
+{% extends "account/base.html" %}
+{% load static %}
+{% load account socialaccount %}
+
+{% load i18n %}
+
+{% block title %}Sign In{% endblock %}
+
+
+{% block card_header %}
+<div class="col">
+    <h3 class="mb-0">Вход в аккаунт</h3>
+</div>
+{% endblock %}
+
+{% block_card_body %}
+<div class="col mb-3" style="position: relative;">
+    <hr class="m-0" />
+    <span class="text-nowrap text-white-50" style="position: absolute;padding: 0 10px;background-color: #303030;top: 50%;left: 50%;transform: translate(-50%) translateY(-14px);"> Продолжить с :</span>
+</div>
+<div class="col">
+    <a class="btn fs-5 border rounded px-2" role="button" href="{% provider_login_url 'google' process='reauthenticate' %}">
+        <img class="align-text-bottom" src="{% static 'tracking/img/google_1000x1000.png' %}" width="25" height="25" />
+        <span class="p-0 ps-2" style="background-color: var(--bs-btn-hover-bg);">Google</span>
+    </a>
+</div>
+<div class="col-12 mt-4" style="position: relative;">
+    <hr />
+    <span class="text-white-50" style="position: absolute;padding: 0 10px;background-color: #303030;top: 50%;left: 50%;transform: translate(-50%) translateX(0px) translateY(-14px);">Или введите:</span>
+</div>
+<form class="mt-2 px-sm-5" method="post" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    {% if form.errors %}
+        {% for field in form %}
+            {% for error in field.errors %}
+                <div class="alert alert-error">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-error">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="mb-3">
+        <input class="form-control" type="email" name="login" autocomplete="email" placeholder="Email" />
+    </div>
+    <div class="d-flex mb-3">
+        <input class="form-control rounded-0 rounded-start" type="password" name="password" placeholder="Password" />
+        <span class="text-center bg-white border rounded-end border-dark pass_eye">
+            <i class="icon ion-eye text-dark p-0 px-1"></i>
+        </span>
+    </div>
+    <div class="d-flex flex-row flex-nowrap mb-3">
+        <div class="form-check form-check-inline form-check-reverse text-nowrap fs-6">
+            <input id="formCheck-1" class="form-check-input" type="checkbox" name="remember"/>
+            <label class="form-check-label" for="formCheck-1">Запомнить</label>
+        </div>
+        <a class="text-nowrap link-info" href="{% url 'account_reset_password' %}">Забыли пароль?</a>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-primary d-block w-100" type="submit">Войти</button>
+    </div>
+</form>
+<div class="col mt-3">
+    <hr class="m-0 p-0" />
+</div>
+<div class="col mt-2">
+    <p class="mb-0">
+        <a class="text-nowrap link-info" href="{% url 'account_signup' %}">Еще нет аккаунта</a> или 
+        <a class="text-nowrap link-info" href="{% url 'account_reset_password' %}">забыли пароль?</a>
+    </p>
+</div>
+{% endblock %}
+
+<!-- {% block acc_content %}
+<section class="position-relative py-4 py-xl-5">
+    <div class="container">
+        <div class="row d-flex justify-content-center">
+            <div class="col-sm-9 col-md-6 col-lg-5 col-xl-4">
+                <div class="card text-center">
+                    <div class="card-header d-flex flex-row">
+                        <div class="col">
+                            <h3 class="mb-0">Вход в аккаунт</h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col mb-3" style="position: relative;">
+                            <hr class="m-0" />
+                            <span class="text-nowrap text-white-50" style="position: absolute;padding: 0 10px;background-color: #303030;top: 50%;left: 50%;transform: translate(-50%) translateY(-14px);"> Продолжить с :</span>
+                        </div>
+                        <div class="col">
+                            <a class="btn fs-5 border rounded px-2" role="button" href="{% provider_login_url 'google' process='reauthenticate' %}">
+                                <img class="align-text-bottom" src="{% static 'tracking/img/google_1000x1000.png' %}" width="25" height="25" />
+                                <span class="p-0 ps-2" style="background-color: var(--bs-btn-hover-bg);">Google</span>
+                            </a>
+                        </div>
+                        <div class="col-12 mt-4" style="position: relative;">
+                            <hr />
+                            <span class="text-white-50" style="position: absolute;padding: 0 10px;background-color: #303030;top: 50%;left: 50%;transform: translate(-50%) translateX(0px) translateY(-14px);">Или введите:</span>
+                        </div>
+                        <form class="mt-2 px-sm-5" method="post" action="{% url 'account_login' %}">
+                            {% csrf_token %}
+                            {% if redirect_field_value %}
+                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                            {% endif %}
+                            {% if form.errors %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="alert alert-error">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <div class="alert alert-error">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="mb-3">
+                                <input class="form-control" type="email" name="login" autocomplete="email" placeholder="Email" />
+                            </div>
+                            <div class="d-flex mb-3">
+                                <input class="form-control rounded-0 rounded-start" type="password" name="password" placeholder="Password" />
+                                <span class="text-center bg-white border rounded-end border-dark pass_eye">
+                                    <i class="icon ion-eye text-dark p-0 px-1"></i>
+                                </span>
+                            </div>
+                            <div class="d-flex flex-row flex-nowrap mb-3">
+                                <div class="form-check form-check-inline form-check-reverse text-nowrap fs-6">
+                                    <input id="formCheck-1" class="form-check-input" type="checkbox" name="remember"/>
+                                    <label class="form-check-label" for="formCheck-1">Запомнить</label>
+                                </div>
+                                <a class="text-nowrap link-info" href="{% url 'account_reset_password' %}">Забыли пароль?</a>
+                            </div>
+                            <div class="mb-3">
+                                <button class="btn btn-primary d-block w-100" type="submit">Войти</button>
+                            </div>
+                        </form>
+                        <div class="col mt-3">
+                            <hr class="m-0 p-0" />
+                        </div>
+                        <div class="col mt-2">
+                            <p class="mb-0">
+                                <a class="text-nowrap link-info" href="{% url 'account_signup' %}">Еще нет аккаунта</a> или 
+                                <a class="text-nowrap link-info" href="{% url 'account_reset_password' %}">забыли пароль?</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <h1>Sign In</h1>
+
+    {% get_providers as socialaccount_providers %}
+
+    {% if socialaccount_providers %}
+    <p>{% blocktrans with site.name as site_name %}Please sign in with one
+    of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
+    for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
+
+    <div class="socialaccount_ballot">
+        <ul class="socialaccount_providers">
+            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+        </ul>
+
+        <div class="login-or">{% trans 'or' %}</div>
+    </div>
+
+    {% include "socialaccount/snippets/login_extra.html" %}
+
+    {% else %}
+    <p>{% blocktrans %}If you have not created an account yet, then please
+    <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+    {% endif %}
+
+    <form class="login" method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+        <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
+    </form>
+
+{% endblock %} -->

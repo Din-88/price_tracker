@@ -1,0 +1,30 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+
+{% load account %}
+
+{% block title %}{% trans "Confirm E-mail Address" %}{% endblock %}
+
+{% block card_header %}
+    {% trans "Confirm E-mail Address" %}
+{% endblock %}
+
+{% block card_body %}
+    {% if confirmation %}
+        {% user_display confirmation.email_address.user as user_display %}
+
+        <p>
+            Пожалуйста, подтвердите, что <a class="text-nowrap link-info" href="mailto:{{ email }}">{{ email }}</a> это адрес электронной почты для пользователя {{ user_display }}
+        </p>
+
+        <form class="mt-2 px-sm-5" method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+            {% csrf_token %}
+            <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit">{% trans 'Confirm' %}</button></div>
+        </form>
+    {% else %}
+        {% url 'account_email' as email_url %}
+        <p>Ссылка некорректна или срок её действия истек.</p>
+        <p>Пожалуйста, <a class="text-nowrap link-info" href="{{ email_url }}">запросите подтверждение e-mail</a> заново.</p>
+    {% endif %}
+{% endblock %}

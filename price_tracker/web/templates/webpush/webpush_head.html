@@ -1,0 +1,13 @@
+{% if user.is_authenticated or group %}
+  {% load static %}
+
+  {# <script src="{% url 'javascript-catalog' %}"></script> #}
+
+  <script id="webpush-js" type="text/javascript" src="{% static 'web/js/webpush.js' %}"></script>
+  
+  <meta name="service-worker-js" content="{% url 'service_worker' %}">
+  <meta name="webpush-vapid-key" content="{{ vapid_public_key }}">
+  <meta name="webpush-group" content="{{ group }}">
+  <meta name="webpush-save-url" content="{{ webpush_save_url }}">
+  
+{% endif %}

@@ -1,0 +1,245 @@
+{% load static %}
+{% load account socialaccount %}
+{% load webpush_notify %}
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head> 
+    <meta charset="utf-8">
+    <title>{% block title %}Price Tracker{% endblock %}</title>
+
+    {% webpush_head %}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'web/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'web/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'web/favicon/favicon-16x16.png' %}">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&amp;display=swap">
+    <link rel="stylesheet" href="{% static 'web/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'web/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'web/fonts/ionicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'web/css/slider-switch.css' %}">
+    {# <link rel="stylesheet" href="{% static 'web/fonts/font-awesome.min.css' %}"> #}
+    {# <link rel="stylesheet" href="{% static 'web/css/Navbar-Right-Links-Dark-icons.css' %}"> #}
+
+    {% block head %} {% endblock %}
+</head>
+
+
+<body style="background: rgb(0,0,0);">
+    <div class="visually-hidden col track" id="tracker" sort-id>
+        <div class="card tc">
+            <div class="card-header d-flex flex-row p-1 tc-head">
+                <div class="col" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#" aria-controls="" role="button">
+                    <div class="row g-0">
+                        <div class="col-2 tc-h-div-img">
+                            <img class="rounded-circle tc-h-img" src="" alt="img" loading="lazy" />
+                        </div>
+                        <div class="col d-flex flex-column ms-1">
+                            <span class="text-nowrap fs-5 text-end tc-h-price">Price</span>
+                            <h6 class="fw-bold text-end tc-h-h line-clamp">Product name<br /></h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto d-flex align-items-center tc-h-dad">
+                    <i class="icon ion-arrow-move fs-3"></i>
+                </div>
+            </div>
+            <div id="" class="card-body p-0 collapse">
+                <div class="card d-flex flex-row flex-wrap">
+                    <div class="col d-inline-flex justify-content-between order-first col-12 tc-top">
+                        <a class="link-info" href="#" target="_blank">Host</a>
+                        <span class="text-info">date time</span>
+                    </div>
+                    <div class="col-12">
+                        <hr class="tc-hr-1" />
+                    </div>
+                    <div class="col-9 tc-div-chart">
+                        <div class="tc-chart">
+                            <canvas></canvas>
+                        </div>
+                    </div>
+                    <div class="col-3 text-center tc-b-div-img pe-1">
+                        <img class="tc-b-img" style="max-height: 100px;" src="" alt="img" loading="lazy" />
+                    </div>
+                    <div class="col-12 div-hr">
+                        <hr class="tc-hr-3" />
+                    </div>
+                    <div class="col-12 d-flex flex-row justify-content-around align-items-center align-items-lg-center align-self-lg-stretch" tracker-options>
+                        <div>
+                            <button class="btn tc-opt-butt visually-hidden" type="button">
+                                <i class="icon ion-android-delete text-danger"></i>
+                            </button>
+                            <button class="btn tc-opt-butt visually-hidden" type="button">
+                                <i class="icon ion-android-add text-info"></i>
+                            </button>
+                        </div>
+                        <div class="d-flex flex-row align-items-center">
+                            <span>7/30дн</span>
+                            <div class="d-flex my-auto tc-b-tog-d">
+                                <label class="form-label switch m-0" for="">
+                                    <input id="" type="checkbox" checked />
+                                    <div class="slider-on-on slider round"></div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center align-items-lg-start">
+                            <span>Уведомления</span>
+                            <div class="d-flex my-auto tc-b-tog-d">
+                                <label class="form-label switch m-0" for="">
+                                    <input id="" type="checkbox"/>
+                                    <div class="slider round"></div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn tc-opt-butt" type="button">
+                                <i class="icon ion-android-refresh text-info"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-12 d-md-block d-xl-block">
+                        <hr class="tc-hr-4" />
+                    </div>
+                    <div class="col-12 line-clamp text-center text-info order-last ps-1 pe-1">
+                        <a class="link-info" href="#" target="_blank">product url</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="top-alert"></div>
+ 
+    {% block data %}{% endblock %}
+    
+    <header>
+        <nav class="navbar navbar-dark navbar-expand-lg bg-dark py-2">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="/">
+                    <span class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon">
+                        <img src="{% static 'web/favicon/favicon-32x32.png' %}" alt="PT">
+                        <svg class="bi bi-bezier" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16"> </svg>
+                    </span>
+                    <span>Price Tracker</span>
+                </a>
+                {% block nav_toggle_butt %}
+                <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navcol-1">
+                    <span class="visually-hidden">Toggle navigation</span>
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                {% endblock %}
+                <div id="navcol-1" class="collapse navbar-collapse">
+                    <ul class="navbar-nav ms-auto fs-5">
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">
+                                <i class="icon ion-android-home"></i> {{ user.get_username }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_logout' %}">
+                                <i class="icon ion-log-out"></i> Выйти
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_login' %}">
+                                <i class="icon ion-log-in"></i> Войти
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_signup' %}">
+                                <i class="icon ion-log-in log-up" ></i> Регистрация
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-lg">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="text-white bg-dark">
+        <div class="container py-4 py-lg-5">
+            <div class="row justify-content-center">
+                <div class="col-sm-4 col-md-3 text-center text-lg-start d-flex flex-column item">
+                    <h3 class="fs-6 text-white">Services</h3>
+                    <ul class="list-unstyled">
+                        <li><a class="link-light" href="#">Web design</a></li>
+                        <li><a class="link-light" href="#">Development</a></li>
+                        <li><a class="link-light" href="#">Hosting</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-4 col-md-3 text-center text-lg-start d-flex flex-column item">
+                    <h3 class="fs-6 text-white">About</h3>
+                    <ul class="list-unstyled">
+                        <li><a class="link-light" href="#">Company</a></li>
+                        <li><a class="link-light" href="#">Team</a></li>
+                        <li><a class="link-light" href="#">Legacy</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-4 col-md-3 text-center text-lg-start d-flex flex-column item">
+                    <h3 class="fs-6 text-white">Careers</h3>
+                    <ul class="list-unstyled">
+                        <li><a class="link-light" href="#">Job openings</a></li>
+                        <li><a class="link-light" href="#">Employee success</a></li>
+                        <li><a class="link-light" href="#">Benefits</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 text-center text-lg-start d-flex flex-column align-items-center order-first align-items-lg-start order-lg-last item social">
+                    <div class="fw-bold d-flex align-items-center mb-2">
+                        <span class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center bs-icon me-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-bezier fs-5"></svg>
+                        </span>
+                        <span>Brand</span>
+                    </div>
+                    <p class="text-muted copyright">Sem eleifend donec molestie, integer quisque orci aliquam.</p>
+                </div>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center pt-3">
+                <p class="mb-0">Copyright © 2022 Brand</p>
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-facebook"> </svg>
+                    </li>
+                    <li class="list-inline-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-twitter"></svg>
+                    </li>
+                    <li class="list-inline-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-instagram"> </svg>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        var csrftoken = '{{ csrf_token }}';
+    </script>
+
+    <script src="{% static 'web/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'web/js/sortable.min.js' %}"></script>
+    <script src="{% static 'web/js/chart.min.js' %}"></script>
+
+    <script src="{% static 'web/js/bs-init.js' %}"></script>
+
+    <script src="{% static 'web/js/utils.js' %}"></script>
+    <script src="{% static 'web/js/tracker.js' %}"></script>
+    <script src="{% static 'web/js/api.js' %}"></script>
+    <script src="{% static 'web/js/actions.js' %}"></script>
+    
+
+    <script src="{% static 'web/js/init.js' %}"></script>
+    <script src="{% static 'web/js/sortable.js' %}"></script>
+
+    {% block js %} {% endblock %}
+</body>
+</html>

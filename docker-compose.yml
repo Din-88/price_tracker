@@ -1,0 +1,112 @@
+version: "3.9"
+
+name: prod_price_tracker
+
+x-logging:
+  &default-logging
+  driver: json-file
+  options:
+    max-size: '1m'
+    max-file: '3'
+    compress: "true"
+    mode: "non-blocking"
+
+services:
+  postgres:
+    container_name: pt_postgres
+    build:
+      ./postgres
+    environment:
+      PGDATA: ${PGDATA}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/postgres.conf:/etc/postgresql/postgresql.conf    
+    networks:
+      - default
+    command:
+      postgres -p ${POSTGRES_PORT} -c config_file=/etc/postgresql/postgresql.conf -c log_connections=on -c log_disconnections=on -c log_statement=ddl -c log_min_error_statement=info
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p ${POSTGRES_PORT}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2'
+    #       memory: 1.0G
+    logging: *default-logging
+    tty:
+      true
+    restart:
+      unless-stopped
+  
+  redis:
+    container_name:
+      pt_redis
+    image:
+      redis:7.0.9-alpine
+    networks:
+      - default
+    logging: *default-logging
+    restart:
+      unless-stopped
+
+  price_tracker:
+    container_name:
+      price_tracker      
+    # user: "${PT_UID}:${PT_GID}"
+    build:
+      ./price_tracker
+    entrypoint:
+      ["/bin/bash", "entrypoint.sh"]
+    volumes:
+      - ./price_tracker/:/src/
+      - pt_static:/src/static:rw
+    env_file:
+      - .env
+    networks:
+      - default
+      - nginx_proxy_net
+    depends_on:
+      - postgres
+    logging: *default-logging
+    tty:
+      true
+    restart:
+      unless-stopped
+
+  celery:
+    extends:
+      service: price_tracker    
+    container_name:
+      celery
+    entrypoint:
+      ["/bin/bash", "entrypoint_celery.sh"]
+    volumes:
+      - ./log/celery:/var/log/celery
+    logging: *default-logging
+    depends_on:
+      - redis
+    tty: true
+    
+
+networks:
+  nginx_proxy_net:
+    name: nginx_proxy_net
+    # external: true
+
+volumes:
+  pt_static:
+    name: pt_static
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: $PWD/price_tracker/static
+

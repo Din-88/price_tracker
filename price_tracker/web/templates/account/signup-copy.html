@@ -1,0 +1,103 @@
+{% extends "account/base.html" %}
+{% load static %}
+{% load account socialaccount %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Signup" %}{% endblock %}
+
+{% block acc_content %}
+<section class="position-relative py-4 py-xl-5">
+    <div class="container">
+        <div class="row d-flex justify-content-center">
+            <div class="col-sm-9 col-md-6 col-lg-5 col-xl-4">
+                <div class="card text-center">
+                    <div class="card-header d-flex flex-row">
+                        <div class="col">
+                            <h3 class="mb-0">Регистрация</h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col mb-3" style="position: relative;">
+                            <hr class="m-0" />
+                            <span class="text-nowrap text-white-50" style="position: absolute;padding: 0 10px;background-color: #303030;top: 50%;left: 50%;transform: translate(-50%) translateY(-14px);"> Продолжить с :</span>
+                        </div>
+                        <div class="col">
+                            <a class="btn fs-5 border rounded px-2" role="button" href="{% provider_login_url 'google' process='connect' %}">
+                                <img class="align-text-bottom" src="{% static 'tracking/img/google_1000x1000.png' %}" width="25" height="25" />
+                                <span class="p-0 ps-2" style="background-color: var(--bs-btn-hover-bg);">Google</span>
+                            </a>
+                        </div>
+                        <div class="col-12 mt-4" style="position: relative;">
+                            <hr />
+                            <span class="text-white-50" style="position: absolute;padding: 0 10px;background-color: #303030;top: 50%;left: 50%;transform: translate(-50%) translateX(0px) translateY(-14px);">Или введите:</span>
+                        </div>
+                        <form class="mt-2 px-sm-5" method="post" action="{% url 'account_signup' %}">
+                            {% csrf_token %}
+                            {% if redirect_field_value %}
+                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                            {% endif %}
+                            {% if form.errors %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="alert alert-error">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <div class="alert alert-error">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="mb-3">
+                                <input class="form-control" type="email" name="email" autocomplete="username" placeholder="Email" />
+                            </div>
+                            <div class="d-flex mb-3">
+                                <input class="form-control rounded-0 rounded-start" type="password" name="password1" autocomplete="new-password" placeholder="Пароль" />
+                                <span class="text-center bg-white border rounded-end border-dark pass_eye">
+                                    <i class="icon ion-eye text-dark p-0 px-1"></i>
+                                </span>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <input class="form-control rounded-0 rounded-start" type="password" name="password2" autocomplete="new-password" placeholder="Подтвердить пароль" />
+                                <span class="text-center bg-white border rounded-end border-dark pass_eye">
+                                    <i class="icon ion-eye text-dark p-0 px-1"></i>
+                                    </span>
+                            </div>
+                            <div class="mb-3">
+                                <button class="btn btn-primary d-block w-100" type="submit">Войти</button>
+                            </div>
+                        </form>
+                        <div class="col mt-3">
+                            <hr class="m-0 p-0" />
+                        </div>
+                        <div class="col mt-2">
+                            <p class="mb-0">
+                                <a class="text-nowrap link-info" href="{{ account_login }}">Уже есть аккаунт</a> или 
+                                <a class="text-nowrap link-info" href="{% url 'account_reset_password' %}">забыли пароль?</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<h1>{% trans "Sign Up" %}</h1>
+
+<p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+
+<form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %}
+  <button type="submit">{% trans "Sign Up" %} &raquo;</button>
+</form>
+
+{% endblock %}
