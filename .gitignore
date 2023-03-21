@@ -1,0 +1,12 @@
+.env*
+*db*
+venv
+.vscode
+__pycache__
+future
+design
+
+logs/*
+postgres/data
+price_tracker/static/*
+price_tracker/fixtures
