@@ -1,0 +1,62 @@
+{% extends "web/base.html" %}
+
+{% block title %}Price Tracker{% endblock %}
+
+{% block content %}
+
+{% block data %}
+<div class="visually-hidden" id="tracker_ids">
+    {% for t in object_list %}
+    {{ t.pk }},
+    {% endfor %}
+</div>
+{% endblock %}
+
+<main>    
+    <section>   <!-- top -->
+        <div class="row">
+            <div class="col text-center mb-2">
+                <h3>Price Tracking</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center">
+                <h5>Отслеживайте изменение цены на интересующий вас товар.<br /></h5>
+            </div>
+            <div class="col text-center">
+                <h5>Получайте уведомления когда Price Tracking обнаружит измененния цены или статус товара.<br /></h5>
+            </div>
+            <div class="col">
+                <h5 class="text-center">Попробуйте сервис Price Tracker прямо сейчас.<br /><br /></h5>
+            </div>            
+        </div>
+    </section>
+
+    <section id="tracker_new">   <!-- new -->
+        <div class="col-12 mt-2">
+            <h6 class="text-center">Вставьте ссылку на товар в поле ввода и нажмите Подтвердить.<br /></h6>
+        </div>
+        <div class="col mb-2">
+            <form class="d-flex flex-column flex-md-row" target="_self" id="f_new_tracker">
+                <label class="form-label d-none lable" for="url"></label>
+                <input id="url-1" class="form-control url-input" type="url" name="url" placeholder="https://example.com/example-product.com" inputmode="url" autocomplete="on" required minlength="20" />
+                <button class="btn btn-primary align-self-end align-self-sm-end" type="submit">Confirm</button>
+            </form>
+            <div id="new-trecker-alert"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-9"></div>
+            <div class="col-md-3 d-sm-flex flex-row flex-md-column mt-1 mt-md-0 ps-md-0">
+                <p class="text-bg-dark stn-p my-1 mx-md-0 mt-md-0 rounded-2">Переключить график на отображение истории цены за последние 7 или 30 дней.</p>
+                <p class="text-bg-dark stn-p my-1 mx-sm-1 mx-md-0 rounded-2 ">Нажмите Обновить что бы получить цену товара на текущей момент.</p>
+                <p class="text-bg-dark stn-p my-1 mx-md-0 rounded-2">Включите Уведомления что бы не пропустить выгодный момент для совершения покупки.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-3">    <!-- preview -->
+        <div class="row gx-3 gy-3 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3" drag-column></div>
+    </section>
+</main>
+
+{% endblock %}

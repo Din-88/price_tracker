@@ -1,0 +1,58 @@
+# price_tracker
+version: "3.9"
+
+name: dev_price_tracker
+
+services:
+  postgres:
+    container_name:
+      dev_pt_postgres
+    command:
+      postgres -p ${POSTGRES_PORT} -c config_file=/etc/postgresql/postgresql.conf -c log_connections=yes -c log_statement=all -c log_min_error_statement=debug3
+    # ports:
+    #   - 5434:5434
+    # expose:
+    #   - 5434
+    # env_file:
+    #   - .env
+    #   - .env.dev
+  
+  redis:
+    container_name:
+      dev_pt_redis
+
+  price_tracker:
+    container_name:
+      dev_price_tracker
+    build:
+      ./price_tracker
+    # ports:
+    #   - 8000:8000
+    expose:
+      - 8000
+    env_file:
+      - .env.dev
+    networks:
+      - default
+    volumes:
+      - ./price_tracker/:/src/:rw
+    # entrypoint:
+    #   ["/bin/bash"]
+    # expose:
+    #   - 5432
+  
+  celery:
+    env_file:
+      - .env.dev
+    container_name:
+      dev_celery
+
+networks:
+  nginx_proxy_net:
+    name: nginx_proxy_net
+    external: true
+
+volumes:
+  pt_static:
+    name: pt_static
+    external: true

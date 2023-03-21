@@ -1,0 +1,20 @@
+from django.shortcuts import render
+
+from rest_framework import permissions, status, viewsets
+
+from rest_framework.generics import (
+    RetrieveAPIView,
+    GenericAPIView,
+    RetrieveUpdateAPIView,
+)
+
+from .serializers import UserSerializer
+
+
+class AccountBasics(RetrieveUpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+    http_method_names = ['get', "post", "put", "patch", ]
+
+    def get_object(self):
+        return self.request.user

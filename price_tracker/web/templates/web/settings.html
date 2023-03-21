@@ -1,0 +1,195 @@
+{% extends "tracking/base.html" %}
+{% load static %}
+
+{% block title %}Price Tracker{% endblock %}
+
+{% block head-link %}
+<link rel="stylesheet" href="{% static 'tracking/css/left-navbar.css' %}">
+{% endblock %}
+
+{% block data %}
+<div class="visually-hidden" id="tracker_ids">
+    {% for pk in object_list %}
+    {{ pk }},
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block nav_toggle_butt %}
+<button class="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-1">
+    <span class="visually-hidden">Toggle navigation</span>
+    <span class="navbar-toggler-icon"></span>
+</button>    
+{% endblock %}
+
+{% block content %}
+<div class="d-flex">
+    <div id="offcanvas-1" class="offcanvas-lg offcanvas-start" tabindex="-1" data-bs-scroll="true">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Offcanvas Title</h5>
+            <button class="btn-close text-reset" type="button" data-bs-dismiss="offcanvas" aria-label="Close" data-bs-target="#offcanvas-1"></button>
+        </div>
+
+        <div class="offcanvas-body">
+            <ul class="nav flex-column nav-fill d-flex align-items-baseline" role="tablist">
+                <li class="nav-item active" data-bs-toggle="list"><button class="btn nav-link" type="button" id="act_my_trackers">My Trackers</button></li>
+                <li class="nav-item" data-bs-toggle="list"><button class="btn nav-link" type="button" id="act_by_price">By Price</button></li>
+                <li class="nav-item" data-bs-toggle="list"><button class="btn nav-link" type="button" id="act_by_update">By Update</button></li>
+                <li class="nav-item" data-bs-toggle="list"><button class="btn nav-link" type="button" id="act_collapse">Expand/Collapse</button></li>
+                <li class="nav-item" data-bs-toggle="list" hidden><button class="btn nav-link" type="button" id="act_update_all">Update All</button></li>
+                <li class="nav-item" data-bs-toggle="list"><button class="btn nav-link" type="button" id="act_new_tracker">New Tracker</button></li>
+            </ul>
+            <ul class="nav flex-column nav-fill d-flex align-items-baseline">
+                <li class="nav-item"><a class="nav-link user-name" href="{% url 'settings' %}">
+                    {% if user.is_authenticated %}
+                    {{ user.get_username }}
+                    {% else %}
+                    John Doe
+                    {% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link log-out" href="#">Log Out</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <main style="width: 100%;">
+        <h1 class="fs-4">Настройки профиля</h1>
+        <div class="col col-sm-9 col-md-6">
+            <div class="row row-cols-1">
+                <div class="col">
+                    <form id="f_basics">
+                        <div class="col d-flex flex-row justify-content-between align-items-center">
+                            <h2 class="fs-5 m-0">Основное</h2>
+                            <button class="btn btn-primary btn-sm" type="button">Редактировать</button>
+                        </div>
+                        <div class="col">
+                            <hr class="m-0" />
+                        </div>
+                        <fieldset style="position: relative;" disabled>
+                            <div><label class="form-label">Имя<input class="form-control form-control-sm" type="text" name="first_name" value="John" autocomplete="name" /></label></div>
+                            <div><label class="form-label">Фамилия<input class="form-control form-control-sm" type="text" name="last_name" value="Doe" autocomplete="family-name" /></label></div>
+                            <div><label class="form-label">
+                                Дата рождения
+                                <input class="form-control form-control-sm" type="date" min="1920-01-01" max="2020-01-01" name="birth_date" value="1970-01-01" data-date-format="dd/mm/yy" style="color: black;" autocomplete="bday">
+                            </label>
+                        </div><button class="btn btn-primary btn-sm" type="submit" style="position: absolute;right: 0;bottom: 8px;">Сохранить</button>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="col">
+                    <hr class="mt-0" />
+                </div>
+            </div>
+            <div class="row row-cols-1 mt-3">
+                <div class="col flex-column align-items-start">
+                    <form id="f_account">
+                        <div class="col d-flex flex-row justify-content-between align-items-center">
+                            <h2 class="fs-5 m-0">Аккаунт</h2>
+                            <button class="btn btn-primary btn-sm" type="button">Редактировать</button>
+                        </div>
+                        <div class="col">
+                            <hr class="m-0" />
+                        </div>
+                        <p class="mb-1">Информация используемая для входа на сайт<br /></p>
+                        <fieldset class="d-flex flex-column align-items-start" style="position: relative;" disabled>
+                            <label class="form-label">Логин
+                                <input class="form-control form-control-sm" name="username" type="text" data-bs-toggle="tooltip" data-bs-placement="right" title="Имя пользователя используется для входа. Должно быть уникальным." value="JohnDoe" autocomplete="username" />
+                            </label>
+                            <label class="form-label">E-mail
+                                <input class="form-control form-control-sm" name="email" type="email" data-bs-toggle="tooltip" data-bs-placement="right" value="example@email.com" title="На новый e-mail будет высланно письмо с ссылкой для подтверждения" autocomplete="email" /></label>
+                            <div><a class="btn btn-secondary btn-sm my-2" data-bs-toggle="collapse" aria-expanded="true" aria-controls="collapse-1" href="#collapse-1" role="button">Сменить пароль      <i class="fa fa-chevron-down"></i></a>
+                                <div id="collapse-1" class="collapse show">
+                                    <div class="col d-flex flex-column justify-content-start">
+                                        <label class="form-label">Текущий пароль
+                                            <input class="form-control form-control-sm" name="curr_pass" type="password" placeholder="**********" autocomplete="current-password" />
+                                        </label>
+                                        <label class="form-label">Новый пароль
+                                            <input class="form-control form-control-sm" name="new_pass1" type="password" placeholder="**********" autocomplete="new-password" />
+                                        </label>
+                                        <label class="form-label">Повтор нового пароля
+                                            <input class="form-control form-control-sm" name="new_pass2" type="password" placeholder="**********" autocomplete="new-password" />
+                                        </label>
+                                        <div class="form-check form-check-inline form-check-reverse text-light"><input id="show_pass" class="form-check-input" type="checkbox" /><label class="form-check-label" for="show_pass">Показать пароль</label></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-sm" type="submit" style="position: absolute;right: 0;bottom: 8px;">Сохранить</button>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="col mt-3">
+                    <p class="m-0">Вход с помощью Ваших аккаунтов</p>
+                    <div class="table-responsive">
+                        <table class="table" id="t_social_acc">
+                            <!-- <thead>
+                                <tr></tr>
+                            </thead> -->
+                            <tbody>
+                                <tr>
+                                    <td>Google</td>
+                                    <td>example@gmail.com</td>
+                                    <td><button class="btn btn-primary btn-sm" type="button">Удалить</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="mb-1">Добавить вход с помощью:</p>
+                    <button class="btn btn-primary btn-sm fs-5 border rounded border-primary p-0" role="button">
+                        <span class="bg-white rounded-start" style="padding: 3px;">
+                            <img width="24px" height="24px" loading="lazy" alt="G" style="vertical-align: text-top;" src="{% static 'tracking/img/google_100x100.png' %}" />
+                        </span>
+                        <span class="fs-6 mx-1 px-2" style="vertical-align: text-bottom;">Google</span>
+                    </button>
+                </div>
+                <div class="col mt-2">
+                    <hr class="mt-0" />
+                </div>
+            </div>
+            <div class="row row-cols-1 mt-3">
+                <div class="col">
+                    <form id="f_notifi">
+                        <div class="col d-flex flex-row justify-content-between align-items-center">
+                            <h2 class="fs-5 m-0">Уведомления</h2>
+                            <button class="btn btn-primary btn-sm" type="button">Редактировать</button>
+                        </div>
+                        <div class="col">
+                            <hr class="m-0" />
+                        </div>
+                        <fieldset style="position: relative;" disabled>
+                            <div class="form-check">
+                                <input id="formCheck-1" class="form-check-input" type="checkbox" name="notifi_types" value="1"/>
+                                <label class="form-check-label" for="formCheck-1">Письмом на E-mail</label>
+                            </div>
+                            <div class="form-check mb-1">
+                                <input id="formCheck-2" class="form-check-input" type="checkbox" name="notifi_types" value="2" />
+                                <label class="form-check-label mb-1" for="formCheck-2">Всплывающие (в т.ч. при закрытом сайте)</label></div>
+                            <p class="mt-2 mb-1">В следующих случаях смены цены:</p>
+                            <div class="form-check mb-1">
+                                <input id="formCheck-3" class="form-check-input" type="radio" name="notifi_case" value="1" />
+                                <label class="form-check-label" for="formCheck-3">При любом изменении</label>
+                            </div>
+                            <div class="form-check mb-1">
+                                <input id="formCheck-4" class="form-check-input" type="radio" name="notifi_case" value="2"  />
+                                <label class="form-check-label" for="formCheck-4">Только при понижении</label>
+                            </div>
+                            <div class="form-check">
+                                <input id="formCheck-5" class="form-check-input" type="radio" name="notifi_case" value="3" />
+                                <label class="form-check-label" for="formCheck-5">Только при повышении</label>
+                            </div>
+                            <button class="btn btn-primary btn-sm" type="submit" style="position: absolute;right: 0;bottom: 8px;">Сохранить</button>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="col">
+                    <hr class="mt-0" />
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'tracking/js/left-nav.js' %}"></script>
+<script src="{% static 'tracking/js/profile_setting.js' %}"></script>
+{% endblock %}
