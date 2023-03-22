@@ -4,17 +4,13 @@
 .offcanvas-lg .offcanvas-body {
   top: 0;
   width: 190px;
-  display: flex;
   position: sticky;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 95vh;
-  padding: 0 10px 15px 10px;
+  min-height: 98vh;
+  padding: 10px 10px 10px 10px;
 }
 .offcanvas-lg .offcanvas-body .nav {
   height: 100%;
-  margin-top: 10px;
-  margin-bottom: 30px;
 }
 .offcanvas-lg .offcanvas-body .nav .nav-item {
   width: 90%;
@@ -55,4 +51,10 @@
 }
 .offcanvas-lg .offcanvas-body .nav .nav-item .nav {
   margin: 0;
+}
+
+@media (max-width: 991.98px){
+.offcanvas-lg .offcanvas-body{
+  min-height: 325px;
+}
 }
