@@ -24,7 +24,7 @@
 
 {% block content %}
 <div class="d-flex">
-    <div id="offcanvas-1" class="offcanvas-lg offcanvas-start" tabindex="-1" data-bs-scroll="true">
+    <div id="offcanvas-1" class="offcanvas-lg offcanvas-start" tabindex="-1" data-bs-scroll="false">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title">Menu</h5>
             <button class="btn-close text-reset" type="button" data-bs-dismiss="offcanvas" aria-label="Close" data-bs-target="#offcanvas-1"></button>
@@ -55,7 +55,7 @@
                     </button>
                 </li>
                 <li class="nav-item flex-grow-0">
-                    <a class="nav-link log-out" href="{% url 'account_signup' %}">
+                    <a class="nav-link log-out" href="{% url 'account_logout' %}">
                         <i class="icon ion-log-in fs-5"></i> Выйти
                     </a>
                 </li>
