@@ -13,30 +13,6 @@
 {% block content %}
 <main>
 
-    {% if messages %}
-    <div>
-        <strong>Messages:</strong>
-        <ul>
-            {% for message in messages %}
-            <li>{{message}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-
-    <div>
-        <strong>Menu:</strong>
-        <ul>
-            {% if user.is_authenticated %}
-            <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
-            <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
-            {% else %}
-            <li><a href="{% url 'account_login' %}">Sign In</a></li>
-            <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
-            {% endif %}
-        </ul>
-    </div>
-
     {% block acc_content %}
     <section class="position-relative py-4 py-xl-5">
         <div class="container">
@@ -55,9 +31,11 @@
                                     <span class="text-nowrap text-white-50" style="position: absolute;padding: 0 10px;background-color: #303030;top: 50%;left: 50%;transform: translate(-50%) translateY(-14px);"> Продолжить с :</span>
                                 </div>
                                 <div class="col">
-                                    <a class="btn fs-5 border rounded px-2" role="button" href="{% provider_login_url 'google' process='login' %}">
-                                        <img class="align-text-bottom" src="{% static 'web/img/google_100x100.png' %}" width="25" height="25" />
-                                        <span class="p-0 ps-2" style="background-color: var(--bs-btn-hover-bg);">Google</span>
+                                    <a class="btn btn-primary fs-5 border rounded border-primary" role="button" style="padding: 0px 0 3px 0;" href="{% provider_login_url 'google' process='login' %}">
+                                        <span class="bg-white rounded-start" style="padding: 4px 3px 7px 7px;">
+                                            <img width="24px" height="24px" loading="lazy" alt="G" style="vertical-align: sub;" src="{% static 'web/img/google_100x100.png' %}" />
+                                        </span>
+                                        <span class="mx-2">Google</span>
                                     </a>
                                 </div>
                             {% endblock %}
