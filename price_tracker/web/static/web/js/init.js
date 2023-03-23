@@ -27,7 +27,7 @@ window.addEventListener('load', function(){
 		localStorage.setItem('beta_messege_date_time', curr_time);
 		show_alert(`Внимание! Сайт находится в ранней бета-версии, что означает, 
 		что он находится в активной разработке и может быть изменен в будущем. 
-		Просим проявить терпение, если что-то не работает должным образом. 
+		Просим проявить терпение, если что-то (или все) не работает должным образом. 
 		<br />Благодарим за понимание!`, 'top-alert');
 	}
 
@@ -51,7 +51,7 @@ window.addEventListener('load', function(){
 	sor[0] = sortable(drag_containers[0]);
 
 	trackers = {};
-	trackers['new'] = new Tracker(pk=3, is_user=false, is_new=true);
+	trackers['new'] = new Tracker(pk=9, is_user=false, is_new=true);
 
 	el_tracker_new.querySelector('.col-md-9').appendChild(trackers['new'].el);
 

@@ -51,8 +51,16 @@ from .workers.parsers.parsers import Parsers
 
 
 class TrackerViewSet(GenericViewSet):
+    days_ago = timezone.now() - timezone.timedelta(days=90)
+    queryset = Tracker.objects \
+        .prefetch_related(
+            Prefetch(
+                'prices',
+                Price.objects.filter(date_time__gt=days_ago).order_by('id')
+            )
+        )
     
-    queryset = Tracker.objects.all()
+    # queryset = Tracker.objects
     serializer_class = TrackerSerializer
     allowed_methods = ['get', 'put' 'post', 'patch']
 
@@ -72,6 +80,11 @@ class TrackerViewSet(GenericViewSet):
             permission_classes=[AllowAny])
     def get_detail(self, request, pk=None):
         instance = self.get_object()
+        # days_ago = timezone.now() - timezone.timedelta(days=90)
+        # instance.prices \
+        #     .filter(date_time__gt=days_ago) \
+        #     .order_by('-date_time')
+        
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
