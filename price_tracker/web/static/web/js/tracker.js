@@ -238,6 +238,7 @@ class Tracker {
     el_update(data) {
         // console.time('el_update');
         // console.timeEnd('el_update');
+        this.pk = data.pk;
         this.data = data;
         this.is_user = data.is_user;
         this.chart_update(data);
