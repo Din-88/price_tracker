@@ -1,10 +1,16 @@
 import os
 from pathlib import Path
-
-DEBUG = False
-
+import platform
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+if platform.system() == 'Windows':
+    from dotenv import load_dotenv
+    load_dotenv(f'./../.env')
+    load_dotenv(f'./../.env.dev', override=True)
+
+
+DEBUG = False
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 

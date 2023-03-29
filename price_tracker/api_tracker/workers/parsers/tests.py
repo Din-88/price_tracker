@@ -5,6 +5,7 @@ from .parsers import (
     Technodom,
     ShopKz,
     WildberriesKz,
+    WildberriesKzAspx,
     OlxKz,
     Parsers,
     Info,
@@ -78,6 +79,16 @@ class Test_TestWildberriesKz(unittest.TestCase):
         url = 'https://kz.wildberries.ru/product?card=114629100'
 
         info = WildberriesKz(url=url).get_info()
+
+        self.assertIsInstance(info, Info)
+
+
+class Test_TestWildberriesKzAspx(unittest.TestCase):
+    
+    def test_get_info(self):
+        url = 'https://kz.wildberries.ru/catalog/55919141/detail.aspx'
+
+        info = WildberriesKzAspx(url=url).get_info()
 
         self.assertIsInstance(info, Info)
 

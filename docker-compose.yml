@@ -88,8 +88,6 @@ services:
       celery
     entrypoint:
       ["/bin/bash", "entrypoint_celery.sh"]
-    volumes:
-      - ./log/celery:/var/log/celery
     logging: *default-logging
     depends_on:
       - redis

@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+import platform
 
 
 DEBUG = True
@@ -9,6 +10,7 @@ DEBUG = True
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 CSRF_TRUSTED_ORIGINS=['http://localhost:8000']
+ALLOWED_HOSTS = '*'.split(' ')
 
 TEST_RUNNER = [
     'django.test.runner.DiscoverRunner',
@@ -44,6 +46,17 @@ DATABASES = {
         "PORT": os.environ.get('POSTGRES_PORT'),
     }
 }
+
+if platform.system() == 'Windows':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        },
+        'OPTIONS': {
+            'timeout': 60,
+        }
+    }
 
 
 # SWAGGER_SETTINGS = {
