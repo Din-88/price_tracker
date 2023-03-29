@@ -43,8 +43,4 @@ class Migration(migrations.Migration):
                 ('objects', django.contrib.auth.models.UserManager()),
             ],
         ),
-<<<<<<< HEAD
     ]
-=======
-    ]
->>>>>>> 270fed82f98643fef7c2ed101b19ef2922246652
