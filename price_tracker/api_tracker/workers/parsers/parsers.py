@@ -728,13 +728,18 @@ class Parsers():
         info = self.parser(url=self.url).get_info()
         return info.price
 
-    def get_parser(self, host: str) -> BaseParser | None:
-        sub_classes = BaseParser.__subclasses__()
-        for sub in sub_classes:
-            for subsub in sub.__subclasses__():
-                if subsub.host == host:
-                    return subsub
+    def find_host_in_subclasses(self, klass, host):
+        if getattr(klass, 'host', '') == host:
+            return klass
+        for sub in klass.__subclasses__():
+            subsub = self.find_host_in_subclasses(sub, host)
+            if subsub:
+                return subsub
         return None
+
+    def get_parser(self, host: str) -> BaseParser | None:
+        # sub_classes = BaseParser.__subclasses__()
+        return self.find_host_in_subclasses(BaseParser, host)
 
 
 if __name__ == '__main__':
