@@ -11,6 +11,7 @@ from .parsers import (
     Info,
     AlserKz,
     ObyavleniyaKaspiKz,
+    KaspiKz,
     KolesaKz,
     KrishaKz,
 )
@@ -119,6 +120,16 @@ class Test_ObyavleniyaKaspiKz(unittest.TestCase):
     def test_get_info(self):
         url = 'https://market.kz/a/prodam-sistemnyiy-blok-109093743/'
         info = ObyavleniyaKaspiKz(url=url).get_info()
+
+        self.assertIsInstance(info, Info)
+
+
+class Test_KaspiKz(unittest.TestCase):
+    
+    def test_get_info(self):
+        url = 'https://kaspi.kz/shop/p/giant-xtc-jr-20-2022-seryi-103688219/?c=750000000#!/item'
+        url = 'https://kaspi.kz/shop/p/kingston-dtx-64-gb-100759959/?c=750000000&ref=shared_link'
+        info = KaspiKz(url=url).get_info()
 
         self.assertIsInstance(info, Info)
 

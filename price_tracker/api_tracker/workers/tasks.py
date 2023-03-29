@@ -86,7 +86,7 @@ def task_send_push(user_pk, msg):
         # 'title': f'Hi {user.username}',
         'body': msg,
         'icon': '/static/web/favicon/android-chrome-192x192.png',
-        'url':  '/profile',
+        'url':  'https://price-tracker.ddns.net/profile/',
         'requireInteraction': True
         # 'badge': 'https://freeiconshop.com/wp-content/uploads/edd/badge-outline-filled.pnghttps://freeiconshop.com/wp-content/uploads/edd/badge-outline-filled.png',
         # 'image': 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg',

@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 import time
 import random
 import json 
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 from requests.exceptions import ConnectTimeout, ReadTimeout
 from django.utils import timezone
 
@@ -109,7 +109,7 @@ class BaseParser(ABC):
         self.in_stock = None
         pass
 
-    def get_response(self, url: str='', *args, **kwargs) -> Response | None:
+    def get_response(self, url: str='', method='get', *args, **kwargs) -> Response | None:
         if not url:
             url = self.url
         
@@ -122,7 +122,16 @@ class BaseParser(ABC):
             request = requests
             # request = httpx
             try:
-                response = request.get(url=url, headers=headers, timeout=(5, 5), *args, **kwargs)
+                if method == 'get':
+                    response = request.get(url=url, headers=headers, timeout=(5, 5), *args, **kwargs)
+                elif method == 'post':
+                    # url, data=None, json=None, **kwargs
+                    if 'headers' in kwargs:
+                        kwargs['headers']['User-Agent'] = user_agent
+                    else:
+                        kwargs['headers'] = headers
+
+                    response = request.post(url=url, timeout=(5, 5), *args, **kwargs)
                 # response =  httpx.get(url=url, *args, **kwargs)
                 if response.status_code == 200:
                     return response
@@ -548,6 +557,58 @@ class ObyavleniyaKaspiKz(BaseSoupParser):
                 self.price = float(price)
             except Exception as e:
                 return False        
+        return True
+
+
+class KaspiKz(BaseJSONParser):
+    host = 'kaspi.kz'
+
+    def get_response(self, url=''):
+        response = super().get_response()
+        soup = BeautifulSoup(response.text, 'lxml')
+
+        el_img_url = soup.find(name='link', rel='image_src')
+        self.img_url = el_img_url.attrs['href']
+
+        el_title = soup.find(name='title')
+        
+        start = el_title.text.find("Купить") + len("Купить")
+        end = el_title.text.find("в кредит")
+
+        self.title = el_title.text[start:end].strip()
+
+        url_parse = urlparse(self.url)
+
+        id = url_parse.path.split('-')[-1][:-1]
+        query = parse_qs(url_parse.query)
+
+        url = f'https://kaspi.kz/yml/offer-view/offers/{id}'
+        payload = {
+            'cityId': query['c'][0],
+            'limit': 1,
+            'page': 0,
+            'sort': 'true'
+        }
+
+        headers = {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Referer": f'{url_parse.scheme}://{url_parse.hostname}{url_parse.path}'
+        }
+
+        response = super().get_response(url=url, method='post', json=payload, headers=headers)
+
+        return response
+
+
+    def scraping_info(self, data: Any = None) -> bool:
+        if data['offersCount'] == 0:
+            self.price = None
+            return True
+        
+        offer = data['offers'][0]
+        self.price = offer['price']
+        self.currency = '₸'
+
         return True
 
 

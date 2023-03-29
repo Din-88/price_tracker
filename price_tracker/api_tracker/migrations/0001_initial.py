@@ -102,4 +102,8 @@ class Migration(migrations.Migration):
                 ('tracker', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='prices', to='api_tracker.tracker')),
             ],
         ),
+<<<<<<< HEAD
     ]
+=======
+    ]
+>>>>>>> 270fed82f98643fef7c2ed101b19ef2922246652
