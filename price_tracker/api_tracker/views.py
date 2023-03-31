@@ -104,7 +104,7 @@ class TrackerViewSet(GenericViewSet):
         host = instance.host
         prev_price = instance.price
 
-        parser = Parsers().get_parser(host=host)
+        parser = Parsers().get_parser(host=urlparse(url).hostname)
         
         raw_data = parser(url=url).get_info()
         raw_data = asdict(raw_data)

@@ -8,6 +8,7 @@ from django.db.models import Value, CharField, Aggregate
 from django.db.models.functions import Concat
 import time
 from random import randint
+from urllib.parse import urlparse
 
 from django.db.models import Q, F, Sum
 from django.utils import timezone
@@ -112,6 +113,7 @@ def task_set_need_notify(args: tuple[int, None|int|float, None|int|float]):
             - float | int | None - curr_price]
     '''
     tracker_pk, prev_price, curr_price = args
+    
     users = get_user_model().objects \
         .filter(trackers__pk=tracker_pk,
                 trackers_settings__notify_types__isnull=False) \
@@ -258,9 +260,8 @@ def task_parse(tracker_pk):
     tracker = Tracker.objects. \
         only('pk', 'url', 'host', 'price').get(pk=tracker_pk)
     url = tracker.url
-    host = tracker.host
     prev_price = tracker.price
-    parser = Parsers().get_parser(host=host)
+    parser = Parsers().get_parser(host=urlparse(url).hostname)
     if parser:
         info = parser(url=url).get_info()
         tracker.update_from_dict(dict=asdict(info))
