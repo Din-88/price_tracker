@@ -60,7 +60,6 @@ class WorkersTests(TestCase):
 
     def test_task_parse(self):
         result = task_parse.apply(args=[3])
-
         self.assertTrue(result.successful())
 
 
@@ -91,7 +90,7 @@ class WorkersTests(TestCase):
 
 
     @parameterized.expand([
-       # case, prev, curr,  expected case,   expected type
+       # case, prev, curr, case, type
         ('<>', None, None, '',   False),
         ('<>', None, 1,    '?-', True),
         ('<>', 1,    None, '-?', True),
@@ -141,10 +140,9 @@ class WorkersTests(TestCase):
     def test_task_notify_if_need_for_user(
         self, 
         mock_clear_need_notify,
-        mock_task_send_push, mock_task_send_mail):
-
-        # self.user_1.trackers_settings.notify_types.clear()
-        self.user_1.pk
+        mock_task_send_push, 
+        mock_task_send_mail):
+        
         task_set_need_notify((self.tracker_1.pk, 1, 2))
         task_set_need_notify((self.tracker_2.pk, 2, 1))
 
@@ -165,8 +163,7 @@ class WorkersTests(TestCase):
             list(self.user_1.user_tracker \
                 .filter(tracker__in=[self.tracker_1, self.tracker_2]) \
                 .values_list('pk', flat=True)),
-                NotifyType.objects.get(type='push').pk )
-        pass
+            NotifyType.objects.get(type='push').pk)
 
 
     @patch('api_tracker.workers.tasks.task_notify_if_need_for_user.apply_async')
@@ -181,7 +178,6 @@ class WorkersTests(TestCase):
 
         mock_task_notify_if_need_for_user.assert_called_with(
             args=(self.user_1.pk,))
-        pass
 
 
     def test_task_task_clear_need_send_notify(self):
@@ -208,5 +204,3 @@ class WorkersUtilsTests(TestCase):
                 'Цена на 2 Трекера повысилась.\r\n' \
                 'Цена на 1 Трекер понизилась.\r\n'
         self.assertEqual(msg, expect)
-        pass
-

@@ -17,18 +17,11 @@ from urllib.parse import urlparse, parse_qs
 from requests.exceptions import ConnectTimeout, ReadTimeout
 from django.utils import timezone
 
-# from selenium import webdriver
-# from selenium.webdriver import Chrome
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.common.keys import Keys
-# from selenium.webdriver.chrome.options import Options
-# from selenium.webdriver.support.wait import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
-
-# import httpx
-
 
 user_agents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
 	'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
@@ -36,39 +29,20 @@ user_agents = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/106.0.1370.52',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 OPR/92.0.4561.21',
-    'Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 OPR/92.0.4561.21',
-    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38',
-    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 YaBrowser/22.9.1 Yowser/2.5 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/106.0.1370.52',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 YaBrowser/22.9.1 Yowser/2.5 Safari/537.36',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38',
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38',
-    'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 OPR/92.0.4561.21',
-    'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13.0; rv:106.0) Gecko/20100101 Firefox/106.0',
-    'Mozilla/5.0 (X11; Linux i686; rv:106.0) Gecko/20100101 Firefox/106.0',
-    'Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0',
-    'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:106.0) Gecko/20100101 Firefox/106.0',
-    'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0',
-    'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15',
-    # 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)',
-    # 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)',
-    # 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
-    # 'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0)',
-    # 'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',
-    # 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
-    # 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)',
-    # 'Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko',
-    # 'Mozilla/5.0 (Windows NT 6.2; Trident/7.0; rv:11.0) like Gecko',
-    # 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko',
-    # 'Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11.0) like Gecko',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 OPR/92.0.4561.21',
+
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5351.0 Safari/537.36',
     'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 OPR/92.0.4561.21',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38',
 ]
 
 
@@ -105,7 +79,7 @@ class BaseParser(ABC):
         self.img_url  = None
         self.price    = None
         self.currency = None
-        self.archive = False
+        self.archive  = False
         self.in_stock = None
         pass
 
@@ -120,19 +94,15 @@ class BaseParser(ABC):
                 'Content-type': 'application/text; charset=utf-8',
                 }
             request = requests
-            # request = httpx
             try:
                 if method == 'get':
                     response = request.get(url=url, headers=headers, timeout=(5, 5), *args, **kwargs)
                 elif method == 'post':
-                    # url, data=None, json=None, **kwargs
                     if 'headers' in kwargs:
                         kwargs['headers']['User-Agent'] = user_agent
                     else:
                         kwargs['headers'] = headers
-
                     response = request.post(url=url, timeout=(5, 5), *args, **kwargs)
-                # response =  httpx.get(url=url, *args, **kwargs)
                 if response.status_code == 200:
                     return response
             except ConnectTimeout:
@@ -207,71 +177,6 @@ class BaseJSONParser(BaseParser, ABC):
         return True
 
 
-# class BaseSeleniumParser(BaseParser):
-#     def get_response(self, url: str='', *args, **kwargs) -> Response | None:
-#         if not url:
-#             url = self.url
-
-#         options = webdriver.ChromeOptions()
-#         options.add_argument('--ignore-ssl-errors=yes')
-#         options.add_argument('--ignore-certificate-errors')
-#         # options.add_argument('--headless')
-
-#         web_driver = webdriver.Remote(
-#             command_executor='http://chrome:4444/wd/hub',
-#             options=options
-#         )
-
-#         # url = 'https://itnext.io/how-to-run-a-headless-chrome-browser-in-selenium-webdriver-c5521bc12bf0'
-#         web_driver.implicitly_wait(5)
-#         web_driver.get(url)
-
-#         try:            
-#             # myDynamicElement = web_driver.find_element(By.XPATH, '//div[contains(@class, "bx_item_detail bx_blue")]')
-#             x = web_driver.find_element(By.TAG_NAME, 'h1')
-#             t = web_driver.page_source
-#         except Exception as e:
-#             pass
-#         finally:
-#             web_driver.quit()
-#             return t
-
-#         # name='div', class_='bx_item_detail bx_blue'
-#         # element = WebDriverWait(web_driver, 10).until(
-#         #     EC.presence_of_element_located((By.CLASS_NAME, 'bx_item_detail bx_blue'))
-#         # )
-        
-#         # self.web_driver.close()
-
-#         for _ in range(2):
-#             user_agent = random.choice(user_agents) 
-#             headers = {
-#                 'User-Agent': user_agent,
-#                 'Content-type': 'application/text; charset=utf-8',
-#                 }
-#             request = requests
-#             try:
-#                 response = request.get(url=url, headers=headers, timeout=(5, 5), *args, **kwargs)
-#                 if response.status_code == 200:
-#                     return response
-#             except ConnectTimeout:
-#                 pass
-#                 time.sleep(1)
-#             except ReadTimeout:
-#                 pass
-#                 time.sleep(1)
-#             except Exception as e:
-#                 time.sleep(1)
-#         return None
-
-#     def create_info(self) -> bool:
-#         response = self.get_response()
-#         soup = self.get_beautiful_soup(response)
-#         if not self.scraping_info(data=soup):
-#             return False
-#         return True
-
-
 class Parser(BaseParser):
     host = ''
 
@@ -296,7 +201,6 @@ class Sulpak(BaseSoupParser):
             self.img_url  = elem_img.attrs['src']
             self.title    = elem_img.attrs['title']
             self.price    = re.findall('[0-9]+', elem_price.text)
-            # self.price    = elem_price.text.replace(' ', '')[0:-1]
             self.price    = ''.join(self.price)
             self.price    = float(self.price)
             self.currency = elem_price.text[-1]
@@ -337,28 +241,6 @@ class Technodom(BaseSoupParser):
         except Exception as e:
             return False
         return True
-
-
-# class ShopKzp(BaseSeleniumParser):
-#     host = 'shopp.kz'
-
-#     def scraping_info(self, data: BeautifulSoup) -> bool: 
-
-#         product_info = data.find(name='div', class_='bx_item_detail bx_blue')
-#         product_info = json.loads(product_info.attrs['data-product'])
-        
-#         self.img_url = product_info['image']
-#         self.title   = product_info['item_name'].replace(u'&quot;,', '')
-#         self.price   = product_info['price']
-#         available    = product_info['dimension3']
-#         self.currency = '₸'
-
-#         if self.price != 'null':
-#             try:
-#                 self.price = float(self.price)
-#             except Exception as e:
-#                 return False        
-#         return True
 
 
 class ShopKz(BaseSoupParser):
@@ -460,8 +342,7 @@ class OlxKz(BaseSoupParser):
         el = data.find(id='olx-init-config')
         l = el.text.strip().split('\n')
         l = list(map(str.strip, l))
-        # k = n[1].strip()[27:-1]
-        t = l[3].strip()[31:-2] #.replace('\\', '')
+        t = l[3].strip()[31:-2]
         k = ast.literal_eval(f"'{t}'")
 
         j = json.loads(k)
@@ -485,23 +366,6 @@ class OlxKz(BaseSoupParser):
 class AlserKz(BaseJSONParser):
     host = 'alser.kz'
 
-    # def scraping_info(self, data: BeautifulSoup) -> bool:
-    #     product_info = data.find_all(
-    #         name='script', type='application/ld+json')[2]
-    #     product_info = json.loads(product_info.text)
-        
-    #     self.img_url = product_info['image']
-    #     self.title   = product_info['name']
-    #     self.price   = product_info['offers']['price']
-    #     self.currency = '₸'        
-
-    #     if self.price != 'null':
-    #         try:
-    #             self.price = float(self.price)
-    #         except:
-    #             return False        
-    #     return True
-
     def get_response(self, url=''):
         keyword = self.url.split('/')[-1]
         url = f'https://alser.kz/api/products/detail?keyword={keyword}'
@@ -519,12 +383,6 @@ class AlserKz(BaseJSONParser):
 
         self.title = data.get('title')
         self.img_url = data.get('photos')[0]
-        # self.img_url = img_url[:7] + 'cdn' + img_url[7:]
-
-        # https://alser.kz/p/rb33a32n0elwtholodilnik-samsung
-        # https://alser.kz/products/holodilniki-samsung//XOeQyI8pv/rb33a32n0elwtholodilnik-samsung-520x325.png
-        # https://cdn.alser.kz/products/holodilniki-samsung//XOeQyI8pv/rb33a32n0elwtholodilnik-samsung-520x325.png
-
 
         self.in_stock = int(data.get('shops_count', 0)) > 0
         try:
@@ -615,31 +473,6 @@ class KaspiKz(BaseJSONParser):
 class KolesaKz(BaseJSONParser):
     host = 'kolesa.kz'
 
-    # def get_response(self, url: str='', *args, **kwargs) -> Response | None:
-    #     if not url:
-    #         url = self.url
-        
-    #     for _ in range(2):
-    #         user_agent = random.choice(user_agents) 
-    #         headers = {
-    #             'User-Agent': user_agent,
-    #             'Content-type': 'application/text; charset=utf-8',
-    #             }
-    #         request = requests
-    #         # request = httpx
-    #         try:
-    #             response = request.get(url=url, headers=headers, timeout=(5, 5), *args, **kwargs)
-    #             # response =  httpx.get(url=url, *args, **kwargs)
-    #             if response.status_code in [200, 404]:
-    #                 return response
-    #         except ConnectTimeout:
-    #             time.sleep(1)
-    #         except ReadTimeout:
-    #             time.sleep(1)
-    #         except Exception as e:
-    #             time.sleep(1)
-    #     return None
-
     def get_response(self, url=''):
         id = self.url.split('/')[-1]
         url = f'https://kolesa.kz/a/average-price/{id}'
@@ -661,19 +494,6 @@ class KolesaKz(BaseJSONParser):
             except Exception as e:
                 time.sleep(1)
         return None
-    
-    # def create_info(self) -> bool:
-    #     response = self.get_response(self.url)
-    #     if not response:
-    #         return False
-    #     try:
-    #         json = response.json()
-    #     except:
-    #         return False
-        
-    #     if not self.scraping_info(data=json):
-    #         return False
-    #     return True
 
     def scraping_info(self, data: Any = None) -> bool:
         if data.get('message', '') == 'Not Found':
@@ -738,7 +558,6 @@ class Parsers():
         return None
 
     def get_parser(self, host: str) -> BaseParser | None:
-        # sub_classes = BaseParser.__subclasses__()
         return self.find_host_in_subclasses(BaseParser, host)
 
 

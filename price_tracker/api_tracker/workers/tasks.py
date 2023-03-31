@@ -267,8 +267,6 @@ def task_parse(tracker_pk):
         tracker.update_from_dict(dict=asdict(info))
         tracker.prices.add(Price.objects.create(price=info.price))
         curr_price = info.price
-        # tracker.save()
-        # return tracker.host
         try:
             prev_price = float(prev_price)
         except:

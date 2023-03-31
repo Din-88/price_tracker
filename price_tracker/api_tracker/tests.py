@@ -8,6 +8,7 @@ from django.test import TestCase
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
 from rest_framework import status
+from dataclasses import dataclass
 
 from api_tracker.models import (
     Tracker,
@@ -54,9 +55,13 @@ class TrackerViewSetTest(APITestCase):
 
     @patch('api_tracker.workers.parsers.parsers.Parsers.get_parser')
     def test_new(self, mock_get_parser):
-        # mock_get_parser.return_value.return_value = 123
+        @dataclass
+        class Info:
+            url: str
+            price: str
+        
         mock_parser = mock_get_parser.return_value.return_value
-        mock_parser.get_info.return_value = {'price':300, 'url':'new_url'}
+        mock_parser.get_info.return_value = Info(price=300, url='new_url')
 
         response = self.client.post(
             f'/api/tracker/new/', data={'url':'new_url'})
