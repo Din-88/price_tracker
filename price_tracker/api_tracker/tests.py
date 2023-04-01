@@ -20,7 +20,7 @@ from api_tracker.models import (
 
 class TrackerViewSetTest(APITestCase):
     def setUp(self):
-        self.url = 'http://example.com/product/123'
+        self.url = 'https://www.sulpak.kz/product/123'
         self.tracker = Tracker.objects.create(
             url=self.url, title='Product 123', price='100.00')
         self.tracker.save()
@@ -68,7 +68,8 @@ class TrackerViewSetTest(APITestCase):
         self.assertEqual(response.data['info']['price'], '300.00')
         self.assertEqual(response.data['info']['prices'][0]['price'], '300.00')
 
-    def test_get_new_url_exists(self):
+    @patch('api_tracker.workers.tasks.task_send_mail_admins.apply_async')
+    def test_get_new_url_exists(self, mosk_task_send_mail_admins):
         response = self.client.post(
             '/api/tracker/new/', data={'url': self.url})
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
