@@ -41,14 +41,12 @@ class TrackersUserSettings(models.Model):
     notify_types = models.ManyToManyField(
         NotifyType,
         blank=True,
-        # choices=tuple(NotifyType.objects.values_list('id', 'type').all()),
     )
 
     notify_case = models.ForeignKey(
         NotifyCase,
         null=True,
         blank=True,
-        # choices=tuple(NotifyCase.objects.values_list('id', 'case').all()),
         on_delete=models.SET_NULL,
     )
 
@@ -66,13 +64,12 @@ class TrackersUserSettings(models.Model):
                 notify_case, _ = NotifyCase.objects.get_or_create(case='<>')
             if NotifyType.objects.exists():
                 notify_types, _ = NotifyType.objects.get_or_create(type='push')
-            
+
             TrackersUserSettings.objects.create(
                 user=instance,
                 notify_case=notify_case,
             ).notify_types.set([notify_types])
-        # instance.trackers_settings.save()
-    
+
     class Meta:
         verbose_name = 'Trackers User Settings'
         verbose_name_plural = 'Trackers Users Settings'

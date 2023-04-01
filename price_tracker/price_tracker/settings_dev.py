@@ -9,7 +9,7 @@ DEBUG = True
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CSRF_TRUSTED_ORIGINS=['http://localhost:8000']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000']
 ALLOWED_HOSTS = '*'.split(' ')
 
 TEST_RUNNER = [

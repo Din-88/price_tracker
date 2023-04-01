@@ -1,16 +1,10 @@
-import copy
 import re
 from rest_framework import serializers
-# from rest_framework.validators import RegexValidator
 from django.core.validators import RegexValidator
-# from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-from allauth.socialaccount.models import SocialAccount
-
-
-from django.db.models import Model
 
 from api_tracker.serializers import TrackersUserSettingsSerializer
+
 
 User = get_user_model()
 
@@ -19,15 +13,18 @@ class PasswordValidator(object):
     message = 'Invalid current password.'
 
     def __call__(self, value):
-        passwords = {p: value.get(p) for p in ['curr_pass', 'new_pass1', 'new_pass2']}
+        passwords = {p: value.get(p) for p
+                     in ['curr_pass', 'new_pass1', 'new_pass2']}
 
         if any(passwords.values()):
             if not all(passwords.values()):
-                errors = {k: 'Все 3 поля паролей обязательны к заполнению.' for k, v in passwords.items() if not v}
+                errors = {k: 'Все 3 поля паролей обязательны к заполнению.'
+                          for k, v in passwords.items() if not v}
                 raise serializers.ValidationError(errors)
 
             request = self.context.get('request')
-            is_check = request.user.check_password(raw_password=passwords['curr_pass'])
+            is_check = request.user.check_password(
+                raw_password=passwords['curr_pass'])
             if not is_check:
                 raise serializers.ValidationError(
                     {'curr_pass': ['Неверный текущий пароль']})
@@ -37,18 +34,9 @@ class PasswordValidator(object):
                     {'new_pass2': ['Новые пароли не совпадают.']})
 
 
-# class SocialaccountsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = SocialAccount
-#         fields = ['id', 'email']
-#         extra_kwargs = {
-#             'email': {'source': 'extra_data["email"]', 'read_only': True},
-#         }
-
-
 class UserSerializer(serializers.ModelSerializer):
-    # socialaccount_set = SocialaccountsSerializer(many=True, read_only=True)
-    trackers_settings = TrackersUserSettingsSerializer(many=False, required=False)
+    trackers_settings = TrackersUserSettingsSerializer(
+                            many=False, required=False)
 
     pass_regex_validator = RegexValidator(
         regex=re.compile(
@@ -90,18 +78,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        
-        l =list(instance.socialaccount_set.all())
-        
+
         socialaccounts = map(
-            lambda s: {'id': s.id, 'provider': s.provider, 'email': s.extra_data['email']},
+            lambda s: {'id': s.id, 'provider': s.provider,
+                       'email': s.extra_data['email']},
             list(instance.socialaccount_set.all()))
-        
+
         socialaccounts = list(socialaccounts)
         ret['socialaccounts'] = socialaccounts
-        
+
         return ret
-    
 
     def validate(self, data):
         password_validator = PasswordValidator()
@@ -113,13 +99,7 @@ class UserSerializer(serializers.ModelSerializer):
         trackers_settings_data = validated_data.pop('trackers_settings')
         instance = super().update(instance, validated_data)
         TrackersUserSettingsSerializer().update(
-            instance.trackers_settings, TrackersUserSettingsSerializer().validate(trackers_settings_data))
+            instance.trackers_settings,
+            TrackersUserSettingsSerializer().validate(trackers_settings_data))
         instance.save()
         return instance
-
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     representation.update(**representation['profile'])
-    #     representation.pop('profile')        
-
-    #     return representation

@@ -1,4 +1,3 @@
-from django import urls
 from django.urls import include, path, re_path
 from dj_rest_auth.registration.views import (
     SocialAccountListView,
@@ -14,9 +13,10 @@ urlpatterns = [
 
     path('accounts/', include('allauth.urls')),
     path('api/google/', views.GoogleLogin.as_view(), name='api_google_login'),
-    path('api/google/connect/', views.GoogleConnect.as_view(), name='api_google_connect'),
+    path('api/google/connect/', views.GoogleConnect.as_view(),
+         name='api_google_connect'),
     path('google/callback/', views.Callback.as_view(), name='callback'),
-    
+
     path(
         'socialaccounts/',
         SocialAccountListView.as_view(),

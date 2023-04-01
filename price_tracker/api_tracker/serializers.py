@@ -1,11 +1,6 @@
 import copy
-import re
 from rest_framework import serializers
-# from rest_framework.validators import RegexValidator
-from django.core.validators import RegexValidator
-# from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-from allauth.socialaccount.models import SocialAccount
 
 from .models import (
     NotifyType,
@@ -13,7 +8,6 @@ from .models import (
     Tracker,
     Price,
     TrackersUserSettings,
-    UserTracker,
 )
 from django.db.models import Model
 
@@ -31,9 +25,6 @@ class TrackerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tracker
-        # fields = ['last_datetime', 'prices']
-        # fields = ['__all__']
-        # exclude = ['users']
         fields = [
             'pk',
             'prices',
@@ -51,8 +42,6 @@ class TrackerSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
-        # representation['prices'] = representation['prices']#[-100:]
         rep_copy = copy.deepcopy(representation)
         representation = {}
 
@@ -71,7 +60,7 @@ class TrackerSerializer(serializers.ModelSerializer):
 
 class TrackerUpdateSerializer(serializers.ModelSerializer):
     prices = PriceSerializer(many=False, read_only=True)
- 
+
     class Meta:
         model = Tracker
         fields = '__all__'
@@ -82,7 +71,7 @@ class TrackerUpdateSerializer(serializers.ModelSerializer):
         price = Price.objects.create(price=validated_data.get('price'))
         instance.prices.add(price)
         return instance
-    
+
 
 class NewTrackerSerializer(serializers.Serializer):
     url = serializers.URLField(read_only=True)
@@ -96,15 +85,20 @@ class PasswordValidator(object):
     message = 'Invalid current password.'
 
     def __call__(self, value):
-        passwords = {p: value.get(p) for p in ['curr_pass', 'new_pass1', 'new_pass2']}
+        passwords = \
+            {p: value.get(p) for p in ['curr_pass', 'new_pass1', 'new_pass2']}
 
         if any(passwords.values()):
             if not all(passwords.values()):
-                errors = {k: 'Все 3 поля паролей обязательны к заполнению.' for k, v in passwords.items() if not v}
+                errors = {
+                    k: 'Все 3 поля паролей обязательны к заполнению.'
+                    for k, v in passwords.items() if not v
+                }
                 raise serializers.ValidationError(errors)
 
             request = self.context.get('request')
-            is_check = request.user.check_password(raw_password=passwords['curr_pass'])
+            is_check = request.user \
+                .check_password(raw_password=passwords['curr_pass'])
             if not is_check:
                 raise serializers.ValidationError(
                     {'curr_pass': ['Неверный текущий пароль']})
@@ -150,7 +144,11 @@ class TrackersUserSettingsSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
 
         if ret['notify_types']:
-            ret['notify_types'] = NotifyTypeSerializer(instance=NotifyType.objects.filter(pk__in=ret['notify_types']), many=True).data
+            ret['notify_types'] = NotifyTypeSerializer(
+                instance=NotifyType.objects.filter(pk__in=ret['notify_types']),
+                many=True).data
         if ret['notify_case']:
-            ret['notify_case']  = NotifyCaseSerializer(instance=NotifyCase.objects.get(pk=ret['notify_case']), many=False).data
+            ret['notify_case'] = NotifyCaseSerializer(
+                instance=NotifyCase.objects.get(pk=ret['notify_case']),
+                many=False).data
         return ret

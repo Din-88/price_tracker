@@ -1,12 +1,5 @@
-from django.shortcuts import render
-
-from rest_framework import permissions, status, viewsets
-
-from rest_framework.generics import (
-    RetrieveAPIView,
-    GenericAPIView,
-    RetrieveUpdateAPIView,
-)
+from rest_framework import permissions
+from rest_framework.generics import RetrieveUpdateAPIView
 
 from .serializers import UserSerializer
 
