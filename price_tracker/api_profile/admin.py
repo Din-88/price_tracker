@@ -8,7 +8,8 @@ from .models import User
 class MyUserAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "email", 'birth_date')}),
+        (_("Personal info"), 
+            {"fields": ("first_name", "last_name", "email", 'birth_date')}),
         (
             _("Permissions"),
             {
@@ -26,4 +27,3 @@ class MyUserAdmin(UserAdmin):
 
 
 admin.site.register(User, MyUserAdmin)
-

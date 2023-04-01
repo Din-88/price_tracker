@@ -83,12 +83,13 @@ class BaseParser(ABC):
         self.in_stock = None
         pass
 
-    def get_response(self, url: str='', method='get', *args, **kwargs) -> Response | None:
+    def get_response(self, url: str = '', method: str = 'get',
+                     *args, **kwargs) -> Response | None:
         if not url:
             url = self.url
-        
+
         for _ in range(2):
-            user_agent = random.choice(user_agents) 
+            user_agent = random.choice(user_agents)
             headers = {
                 'User-Agent': user_agent,
                 'Content-type': 'application/text; charset=utf-8',
@@ -96,30 +97,32 @@ class BaseParser(ABC):
             request = requests
             try:
                 if method == 'get':
-                    response = request.get(url=url, headers=headers, timeout=(5, 5), *args, **kwargs)
+                    response = request.get(url=url, headers=headers,
+                                           timeout=(5, 5), *args, **kwargs)
                 elif method == 'post':
                     if 'headers' in kwargs:
                         kwargs['headers']['User-Agent'] = user_agent
                     else:
                         kwargs['headers'] = headers
-                    response = request.post(url=url, timeout=(5, 5), *args, **kwargs)
+                    response = request.post(url=url,
+                                            timeout=(5, 5), *args, **kwargs)
                 if response.status_code == 200:
                     return response
             except ConnectTimeout:
                 time.sleep(1)
             except ReadTimeout:
                 time.sleep(1)
-            except Exception as e:
+            except Exception:
                 time.sleep(1)
         return None
 
-    def get_beautiful_soup(self, html:str = None) -> BeautifulSoup | None:
+    def get_beautiful_soup(self, html: str = None) -> BeautifulSoup | None:
         if not html:
             return None
-        
+
         soup = BeautifulSoup(html, 'lxml')
         return soup
-    
+
     @abstractproperty
     def host() -> str:
         pass
@@ -132,7 +135,7 @@ class BaseParser(ABC):
     def create_info(self):
         pass
 
-    def get_info(self) -> Info| None:
+    def get_info(self) -> Info | None:
         if not self.create_info():
             return None
         info = Info(
@@ -169,9 +172,9 @@ class BaseJSONParser(BaseParser, ABC):
             return False
         try:
             json = response.json()
-        except:
+        except Exception:
             return False
-        
+
         if not self.scraping_info(data=json):
             return False
         return True
@@ -215,15 +218,19 @@ class Technodom(BaseSoupParser):
     def scraping_info(self, data: BeautifulSoup) -> bool:
         soup = data
 
-        product_info = soup.find(name='div', class_='Product_block__wrapper__pPWI_')
+        product_info = soup.find(name='div',
+                                 class_='Product_block__wrapper__pPWI_')
         elem_title = product_info.find(name='h1')
-        elem_img   = product_info.find(name='li', class_="slide selected").find(name='img')
-        elem_price = product_info.find(name='p', class_='Typography Typography__Heading Typography__Heading_H1')
+        elem_img   = product_info.find(name='li', class_="slide selected") \
+                                 .find(name='img')
+        elem_price = product_info.find(name='p',
+             class_='Typography Typography__Heading Typography__Heading_H1')
         
         if not elem_price:
-            elem_price = product_info.find(name='p', class_='Typography --accented Typography__Heading Typography__Heading_H1')
+            elem_price = product_info.find(name='p',
+             class_='Typography --accented Typography__Heading Typography__Heading_H1')
 
-        if not elem_price:                
+        if not elem_price:
              self.price = None
              return True
 
@@ -238,7 +245,7 @@ class Technodom(BaseSoupParser):
             else:
                 self.price = None
             self.currency = '₸'
-        except Exception as e:
+        except Exception:
             return False
         return True
 
@@ -260,8 +267,8 @@ class ShopKz(BaseSoupParser):
         if self.price != 'null':
             try:
                 self.price = float(self.price)
-            except Exception as e:
-                return False        
+            except Exception:
+                return False
         return True
 
 
@@ -275,36 +282,36 @@ class WildberriesKz(BaseJSONParser):
         card = query_list[0].split('=')[1]
 
         querystring = {
-            "appType":"128",
-            "curr":"kzt",
-            "locale":"kz",
-            "lang":"ru",
+            "appType": "128",
+            "curr": "kzt",
+            "locale": "kz",
+            "lang": "ru",
             # "dest":"-1029256,-102269,-2162196,-1257786",
             # "regions":"1,4,22,30,31,33,38,40,48,64,66,68,69,70,71,75,80,83",
-            "emp":"0",
-            "reg":"1",
-            "pricemarginCoeff":"1.0",
-            "offlineBonus":"0",
-            "onlineBonus":"0",
-            "spp":"0",
-            "nm":f"{card}"
+            "emp": "0",
+            "reg": "1",
+            "pricemarginCoeff": "1.0",
+            "offlineBonus": "0",
+            "onlineBonus": "0",
+            "spp": "0",
+            "nm": f"{card}"
         }
-        
+
         response = self.get_response(url=url, params=querystring)
-        
+
         if response is None:
             return False
         try:
             json = response.json()
-        except:
+        except Exception:
             return False
-        
+
         if not self.scraping_info(json, card):
             return False
         return True
 
     def scraping_info(self, data, card) -> bool:
-        at=[143,287,431,719,1007,1061,1115,1169,1313,1601]
+        at = [143, 287, 431, 719, 1007, 1061, 1115, 1169, 1313, 1601]
 
         t = int(card)
         n = math.floor(t/1e5)
@@ -317,7 +324,7 @@ class WildberriesKz(BaseJSONParser):
             self.title   = data['data']['products'][0]['name']
             self.price   = data['data']['products'][0]['salePriceU']/100
             self.currency = '₸'
-        except Exception as e:
+        except Exception:
             return False
         return True
 
@@ -358,7 +365,7 @@ class OlxKz(BaseSoupParser):
             else:
                 self.price = None
                 # self.archive = True
-        except Exception as e:
+        except Exception:
             return False
         return True
 
@@ -372,13 +379,12 @@ class AlserKz(BaseJSONParser):
         response = super().get_response(url=url)
         return response
 
-
     def scraping_info(self, data: Any = None) -> bool:
         if not data.get('message') == 'OK':
             return False
         if not data.get('data', {}).get('data'):
             return False
-        
+
         data = data['data']['data']
 
         self.title = data.get('title')
@@ -387,14 +393,14 @@ class AlserKz(BaseJSONParser):
         self.in_stock = int(data.get('shops_count', 0)) > 0
         try:
             self.price = float(data.get('price'))
-        except:
+        except Exception:
             self.price = None
 
         return True
 
 
 class ObyavleniyaKaspiKz(BaseSoupParser):
-    host = 'obyavleniya.kaspi.kz' #'market.kz'
+    host = 'obyavleniya.kaspi.kz'  # market.kz
 
     def scraping_info(self, data: BeautifulSoup) -> bool:
 
@@ -413,8 +419,8 @@ class ObyavleniyaKaspiKz(BaseSoupParser):
         if price:
             try:
                 self.price = float(price)
-            except Exception as e:
-                return False        
+            except Exception:
+                return False
         return True
 
 
@@ -429,7 +435,7 @@ class KaspiKz(BaseJSONParser):
         self.img_url = el_img_url.attrs['href']
 
         el_title = soup.find(name='title')
-        
+
         start = el_title.text.find("Купить") + len("Купить")
         end = el_title.text.find("в кредит")
 
@@ -450,19 +456,20 @@ class KaspiKz(BaseJSONParser):
 
         headers = {
             "Content-Type": "application/json; charset=UTF-8",
-            "Referer": f'{url_parse.scheme}://{url_parse.hostname}{url_parse.path}'
+            "Referer":
+                f'{url_parse.scheme}://{url_parse.hostname}{url_parse.path}'
         }
 
-        response = super().get_response(url=url, method='post', json=payload, headers=headers)
+        response = super().get_response(url=url, method='post', json=payload,
+                                        headers=headers)
 
         return response
-
 
     def scraping_info(self, data: Any = None) -> bool:
         if data['offersCount'] == 0:
             self.price = None
             return True
-        
+
         offer = data['offers'][0]
         self.price = offer['price']
         self.currency = '₸'
@@ -477,21 +484,22 @@ class KolesaKz(BaseJSONParser):
         id = self.url.split('/')[-1]
         url = f'https://kolesa.kz/a/average-price/{id}'
         for _ in range(2):
-            user_agent = random.choice(user_agents) 
+            user_agent = random.choice(user_agents)
             headers = {
                 'User-Agent': user_agent,
                 'Content-type': 'application/text; charset=utf-8',
                 }
             request = requests
             try:
-                response = request.get(url=url, headers=headers, timeout=(5, 5))
+                response = request.get(
+                    url=url, headers=headers, timeout=(5, 5))
                 if response.status_code in [200, 404]:
                     return response
             except ConnectTimeout:
                 time.sleep(1)
             except ReadTimeout:
                 time.sleep(1)
-            except Exception as e:
+            except Exception:
                 time.sleep(1)
         return None
 
@@ -508,7 +516,7 @@ class KolesaKz(BaseJSONParser):
             self.title   = data['data']['name']
             self.price   = data['data']['currentPrice'] * 1.0
             self.currency = '₸'
-        except:
+        except Exception:
             return False
         return True
 
@@ -531,13 +539,13 @@ class KrishaKz(BaseSoupParser):
         if self.price != 'null':
             try:
                 self.price = float(self.price)
-            except:
-                return False        
+            except Exception:
+                return False
         return True
 
 
 class Parsers():
-    def __init__(self, url: str=None) -> None:
+    def __init__(self, url: str = None) -> None:
         if url:
             self.url = url
             host = urlparse(url).hostname

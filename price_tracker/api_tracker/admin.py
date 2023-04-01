@@ -1,10 +1,4 @@
 from django.contrib import admin
-from django.conf import settings
-from django.contrib.auth.models import User
-
-
-# from profile.models import User
-
 
 from .models import (
     NotifyType,
@@ -22,19 +16,12 @@ class PriceInline(admin.TabularInline):
     max_num = 10
 
 
-# class UsersInline(admin.TabularInline):
-#     model = User # settings.AUTH_USER_MODEL
-
-
 class TrackerAdmin(admin.ModelAdmin):
-    # inlines = [PriceInline, UsersInline]
     list_display = ('url', 'date_time', 'price')
-    # fields = ['pub_date', 'question_text']
 
 
 class UserTrackerAdmin(admin.ModelAdmin):
     list_display = ('user', 'tracker', 'notify')
-    # fields = ['pub_date', 'question_text']
 
 
 admin.site.register(NotifyType)

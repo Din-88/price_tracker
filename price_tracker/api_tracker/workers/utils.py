@@ -15,27 +15,21 @@ class GroupConcat(Aggregate):
 
 
 def get_plural_word(n, words):
-    # Определяем остаток от деления на 10
     remainder = n % 10
-    # Определяем остаток от деления на 100
     remainder100 = n % 100
-    # Если остаток от деления на 100 от 11 до 19, то используем третье слово во множественном числе
     if 11 <= remainder100 <= 19:
         return words[2]
-    # Если остаток от деления на 10 равен 1, то используем первое слово во множественном числе
     elif remainder == 1:
         return words[0]
-    # Если остаток от деления на 10 от 2 до 4, то используем второе слово во множественном числе
     elif 2 <= remainder <= 4:
         return words[1]
-    # Во всех остальных случаях используем третье слово во множественном числе
     else:
         return words[2]
 
 
 def message_updated_trackers(notify_cases, total):
     msg = f'У Вас {total} ' \
-        f'{get_plural_word(total, ["обновленный", "обновленныx", "обновленныx"])} ' \
+        f'{get_plural_word(total, ['обновленный', 'обновленныx', 'обновленныx'])} ' \
         f'{get_plural_word(total, ["Трекер", "Трекера", "Трекеров"])}.\r\n'
     
     messages = [msg]

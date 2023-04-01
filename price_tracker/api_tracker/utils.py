@@ -23,10 +23,12 @@ def exception_handler(exc, context):
         else:
             data = {'detail': exc.detail}
 
-        r = {'error': {'code': exc.default_code, 'detail': exc.default_detail, 'data': data}}
+        r = {'error': {
+                'code': exc.default_code,
+                'detail': exc.default_detail,
+                'data': data}}
 
         set_rollback()
         return Response(data=r, status=exc.status_code, headers=headers)
 
     return None
-

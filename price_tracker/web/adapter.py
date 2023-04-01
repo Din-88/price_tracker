@@ -2,7 +2,6 @@ from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account import app_settings
 from allauth.account.app_settings import EmailVerificationMethod
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -18,21 +17,23 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         - social account already exists, just go on
         - social account has no email or email is unknown, just go on
         - social account's email exists, link social account to existing user
-        """        
+        """
 
         # some social logins don't have an email address, e.g. facebook accounts
         # with mobile numbers only, but allauth takes care of this case so just
         # ignore it
         if 'email' not in sociallogin.account.extra_data:
             return
-        
+
         # Ignore existing social accounts, just do this stuff for new ones
         if sociallogin.is_existing:
             process = sociallogin.state.get('process')
             if process == 'login':
                 return
             elif process == 'connect':
-                raise serializers.ValidationError({f'provider_{sociallogin.account.provider}':'Действие отменено.'})            
+                raise serializers.ValidationError(
+                    {f'provider_{sociallogin.account.provider}':
+                     'Действие отменено.'})
             return
 
         # check if given email address already exists.

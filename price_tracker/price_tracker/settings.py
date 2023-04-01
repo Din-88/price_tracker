@@ -2,12 +2,13 @@ import os
 from pathlib import Path
 import platform
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 if platform.system() == 'Windows':
     from dotenv import load_dotenv
-    load_dotenv(f'./../.env')
-    load_dotenv(f'./../.env.dev', override=True)
+    load_dotenv('./../.env')
+    load_dotenv('./../.env.dev', override=True)
 
 
 DEBUG = False
@@ -20,7 +21,7 @@ EMAIL_SUBJECT_PREFIX = 'price_tracker: '
 
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(' ')
-CSRF_TRUSTED_ORIGINS=['https://price-tracker.ddns.net']
+CSRF_TRUSTED_ORIGINS = ['https://price-tracker.ddns.net']
 
 APPEND_SLASH = True
 
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
     'allauth',
-    'allauth.account',    
+    'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
@@ -72,7 +73,7 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'api_tracker.utils.exception_handler',
 }
 
-SOCIALACCOUNT_LOGIN_ON_GET=True
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -207,13 +208,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Celery settings
 r = os.environ.get("REDIS_HOST")
-CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler'
-CELERY_BROKER_URL = f'redis://{os.environ.get("REDIS_HOST")}:{os.environ.get("REDIS_PORT")}'
-CELERY_RESULT_BACKEND = f'redis://{os.environ.get("REDIS_HOST")}:{os.environ.get("REDIS_PORT")}'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BROKER_URL = f'redis://{os.environ.get("REDIS_HOST")}: \
+                        {os.environ.get("REDIS_PORT")}'
+CELERY_RESULT_BACKEND = f'redis://{os.environ.get("REDIS_HOST")}: \
+                        {os.environ.get("REDIS_PORT")}'
 
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379/0"
-CELERYD_LOG_FILE=f'{BASE_DIR}/logs/celery/%n%I.log'
+CELERYD_LOG_FILE = f'{BASE_DIR}/logs/celery/%n%I.log'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
