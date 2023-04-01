@@ -14,6 +14,11 @@ DEBUG = False
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
+
+ADMINS = [('admin', os.environ.get('EMAIL_HOST_USER')),]
+EMAIL_SUBJECT_PREFIX = 'price_tracker: '
+
+
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(' ')
 CSRF_TRUSTED_ORIGINS=['https://price-tracker.ddns.net']
 

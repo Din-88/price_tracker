@@ -47,6 +47,7 @@ from .serializers import (
 
 from .models import *
 from .models import Tracker, Price
+from .workers.tasks import task_send_mail_admins
 from .workers.parsers.parsers import Parsers
 
 
@@ -60,7 +61,6 @@ class TrackerViewSet(GenericViewSet):
             )
         )
     
-    # queryset = Tracker.objects
     serializer_class = TrackerSerializer
     allowed_methods = ['get', 'put' 'post', 'patch']
 
@@ -131,6 +131,9 @@ class TrackerViewSet(GenericViewSet):
 
         parser = Parsers().get_parser(host=urlparse(url).hostname)
         if not parser:
+            msg = f'url: {url} \r\nuser: {request.user.username}'
+            task_send_mail_admins('new_url', msg)
+            
             raise serializers.ValidationError(
                 {'error': 'url unknown'},
                 code=status.HTTP_503_SERVICE_UNAVAILABLE)

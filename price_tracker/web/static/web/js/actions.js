@@ -272,7 +272,11 @@ const action_send_new_tracker = (event) => {
     .then((data) => {
         if ('error' in data){
             if(data.error.data.error === 'url unknown'){
-                show_alert('В настоящий момент мы не можем обрабодать данный url.', 'new-trecker-alert')
+                show_alert(
+                    'В настоящий момент мы не можем обрабодать данный url. ' + 
+                    'Сообщение об этом досадном случаи уже отправленно администарторам ' + 
+                    'и если будет такая техническая возможность в ближайшее время мы это исправим.',
+                    'new-trecker-alert')
             }
             return;
         }   

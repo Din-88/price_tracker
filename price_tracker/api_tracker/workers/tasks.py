@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 from django.db.models import Q, F, Sum
 from django.utils import timezone
 from django.core import mail
-from django.core.mail import send_mail
+from django.core.mail import send_mail, mail_admins
 from django.core.mail.backends.smtp import EmailBackend
 
 from celery import shared_task
@@ -71,6 +71,17 @@ def task_send_mail(user_pk, subject, msg, html_message=None):
         recipient_list=[recipient],
         fail_silently = False
     )
+
+
+@shared_task(
+    max_retries=3,
+    retry_backoff=5,
+    default_retry_delay=5, 
+    time_limit=20,
+    soft_time_limit=10,
+)
+def task_send_mail_admins(subject: str, message: str):
+    mail_admins(subject, message, fail_silently=False)
 
 
 @shared_task(
