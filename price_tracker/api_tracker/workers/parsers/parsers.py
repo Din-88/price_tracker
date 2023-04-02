@@ -333,10 +333,15 @@ class WildberriesKzAspx(WildberriesKz):
     host = 'kz.wildberries.ru'
     url = 'https://kz.wildberries.ru/catalog/55919141/detail.aspx'
 
-    def create_info(self) -> bool:
+    def __init__(self, url: str = '') -> None:
         card = self.url.split('/')[-2]
-        self.url = f'https://global.wildberries.ru/product?card={card}'
-        return super().create_info()
+        url = f'https://global.wildberries.ru/product?card={card}'
+        super().__init__(url=url)
+
+    # def create_info(self) -> bool:
+    #     card = self.url.split('/')[-2]
+    #     self.url = f'https://global.wildberries.ru/product?card={card}'
+    #     return super().create_info()
 
 
 class OlxKz(BaseSoupParser):

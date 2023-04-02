@@ -93,21 +93,22 @@ class TrackerViewSet(GenericViewSet):
             raise serializers.ValidationError(
                 {'error': 'url required'}, code=status.HTTP_400_BAD_REQUEST)
 
-        tracker = Tracker.objects.filter(url=url).first()
-        if tracker:
-            serializer = TrackerSerializer(tracker)
-            return Response(serializer.data, status=status.HTTP_302_FOUND)
-
         parser = Parsers().get_parser(host=urlparse(url).hostname)
         if not parser:
             msg = f'url: {url} \r\nuser: {request.user.username}'
-            task_send_mail_admins('new_url', msg)
+            task_send_mail_admins.apply_async(('new_url', msg))
 
             raise serializers.ValidationError(
                 {'error': 'url unknown'},
                 code=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-        raw_data = parser(url=url).get_info()
+        parser = parser(url=url)
+        tracker = Tracker.objects.filter(url=parser.url).first()
+        if tracker:
+            serializer = TrackerSerializer(tracker)
+            return Response(serializer.data, status=status.HTTP_302_FOUND)
+
+        raw_data = parser.get_info()
 
         serializer = TrackerSerializer(data=asdict(raw_data))
         serializer.is_valid(raise_exception=True)
