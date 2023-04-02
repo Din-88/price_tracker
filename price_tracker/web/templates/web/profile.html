@@ -51,12 +51,12 @@
                 </li>
                 <li class="nav-item flex-grow-0 mt-auto">
                     <button class="btn nav-link user-name" type="button" id="act_settings">
-                        <i class="icon ion-settings fs-5"></i></i> Настройки
+                        <i class="icon ion-settings fs-5"></i>Настройки
                     </button>
                 </li>
                 <li class="nav-item flex-grow-0">
-                    <a class="nav-link log-out" href="{% url 'account_logout' %}">
-                        <i class="icon ion-log-in fs-5"></i> Выйти
+                    <a class="nav-link log-out" href="{% url 'account_logout' %}" id="act_logout">
+                        <i class="icon ion-log-in fs-5"></i>Выйти
                     </a>
                 </li>
             </ul>
@@ -104,11 +104,8 @@
                             <fieldset style="position: relative;" disabled>
                                 <div><label class="form-label">Имя<input class="form-control form-control-sm" type="text" name="first_name" value="John" autocomplete="name" /></label></div>
                                 <div><label class="form-label">Фамилия<input class="form-control form-control-sm" type="text" name="last_name" value="Doe" autocomplete="family-name" /></label></div>
-                                <div><label class="form-label">
-                                    Дата рождения
-                                    <input class="form-control form-control-sm" type="date" min="1920-01-01" max="2020-01-01" name="birth_date" value="1970-01-01" data-date-format="dd/mm/yy" style="color: black;" autocomplete="bday">
-                                </label>
-                            </div><button class="btn btn-primary btn-sm" type="submit" style="position: absolute;right: 0;bottom: 8px;">Сохранить</button>
+                                <div><label class="form-label">Дата рождения<input class="form-control form-control-sm" type="date" min="1920-01-01" max="2020-01-01" name="birth_date" value="1970-01-01" data-date-format="dd/mm/yy" style="color: black;" autocomplete="bday"></label></div>
+                                <button class="btn btn-primary btn-sm" type="submit" style="position: absolute;right: 0;bottom: 8px;">Сохранить</button>
                             </fieldset>
                         </form>
                     </div>
