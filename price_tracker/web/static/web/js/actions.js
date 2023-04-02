@@ -132,6 +132,10 @@ const action_settings = () => {
     show_section_settings();
 }
 
+const action_logout = () => {
+    location.href = origin + '/accounts/logout/';
+}
+
 const offcanvas_nav_click = (event) => {
     event.preventDefault();
     switch (event.target.id) {
@@ -149,6 +153,8 @@ const offcanvas_nav_click = (event) => {
             action_new_tracker(event); break;
         case 'act_settings':
             action_settings(event); break;
+        case 'act_logout':
+            action_logout(); break;
         default:
             console.log(`Sorry.`); break;
     }
