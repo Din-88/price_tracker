@@ -189,7 +189,6 @@ class Account {
 
     disable_push(){
         unsubscribe(registration);
-        // this.els.push_warn.classList.add('visually-hidden');
     }
 
     update_social(value) {
@@ -248,7 +247,6 @@ class Account {
                 }
             })
         }
-        // this.els.birth_date.setCustomValidity('chtoto ne tak');
     }
 
     show_errors(errors) {
@@ -268,7 +266,6 @@ class Account {
             err_el.className = 'pb-2';
             err_el.style.lineHeight = '1.0';
             err_el.style.fontSize = '0.8rem';
-            // this.els_errors[k] = err_el;
             
             setTimeout(()=>{
                 err_el.parentNode.removeChild(err_el);
@@ -294,20 +291,11 @@ window.addEventListener('load', function(){
 function google() {
     let client_id = '663038948523-fiie813mm7hddkq77sj548qtikn4d7fo.apps.googleusercontent.com';
     let redirectUri = encodeURIComponent(`${location.origin}/google/callback/`);
-    // let redirectUri = encodeURIComponent('http://127.0.0.1:8000/google/callback/');
-    // let redirectUri = 'http://127.0.0.1:8000/google/callback/';
-    // let redirectUri = 'http://localhost:8000/google/callback/';
-    // let redirectUri = `${location.origin}/google/callback/`;
     let url = 'https://accounts.google.com/o/oauth2/v2/auth?' +
             'response_type=code' +
             '&client_id=' + client_id +
             '&redirect_uri=' + redirectUri +
-            // '&scope=' + 'https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile ' +
-            //             'https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email ' + 
-            //             'https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fplus.me ' +
-            //             'openid' +
             '&scope=' + 'email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid' +
-            // '&scope=' + encodeURIComponent('https://www.googleapis.com/auth/userinfo.email') +
             '&access_type=offline' + 
             '&state=' + '123456789645321' + 
             '&prompt=select_account';
