@@ -8,6 +8,7 @@ class Tracker {
         this.el = this.el_create(pk, is_user, is_new);
         this.is_new  = is_new;
         this.is_user = is_user;
+        this.avg_price = 0.0;
         this.chart;
         this.chart_create();
     }
@@ -108,12 +109,49 @@ class Tracker {
 
     chart_create() {
         let canvas = this.el.querySelector('canvas');
+        let horizonalLinePlugin = {
+            beforeDraw: function(chart) {
+                let ctx = chart.chart.ctx;
+                let xAxis = chart.scales['x-axis-0'];
+                let yAxis = chart.scales['y-axis-0'];
+
+                if (chart.data.datasets.length > 0) {
+                    let data = chart.data.datasets[0].data.filter(function(value) {
+                        return value !== null && value !== undefined;
+                    });
+
+                    if (data.length <= 0) {
+                        return;
+                    }
+
+                    let mean = data.reduce(function(sum, value) {
+                        return sum + value;
+                    }, 0) / data.length;
+
+                    let style = 'rgba(80,80,80,.7)'
+
+                    ctx.beginPath();
+                    ctx.moveTo(xAxis.left, yAxis.getPixelForValue(mean));
+                    ctx.lineTo(xAxis.right, yAxis.getPixelForValue(mean));
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = style;
+                    ctx.stroke();
+
+                    ctx.font = '14px Lato';
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = style;
+                    ctx.fillText(`Средняя цена ≈ ${mean.toFixed(0)}`, (xAxis.left + xAxis.right) / 2, yAxis.getPixelForValue(mean) - 5);
+
+                    ctx.restore();
+                }
+            }
+        };
+        Chart.pluginService.register(horizonalLinePlugin);
         this.chart = new Chart(canvas, {
             type: 'line',
             data: {
                 // labels: labels,
                 datasets: [{
-                    // label: "123456",
                     lineTension: 0.1,
                     bezierCurve : false,
                     borderColor: "#3e95cd",
@@ -197,24 +235,28 @@ class Tracker {
         
         this.chart.data.labels = labels;
         this.chart.data.datasets[0].data = [];
+        this.chart.update();
         data.forEach((d) => { this.chart.data.datasets[0].data.push(d); this.chart.update(); });
         // this.chart.data.datasets[0].data = data;
-        this.chart.update()
     }
 
     el_data_update(data) {
         this.el.setAttribute('t-pk', data.pk)
         
         if (data.prices.length > 0) {
-            let avg_price = data.prices.reduce((a, b, idx) => a + (parseFloat(b['price']) ? parseFloat(b['price']) : a/idx) , 0) / data.prices.length;
-
-            let curr_price = parseFloat(data.prices[0].price);
+            let curr_price = parseFloat(data.price);
+            let prices = data.prices.filter(function(value) {
+                return value.price !== null && value.price !== undefined;
+            });
+            this.avg_price = prices.reduce(function(sum, value) {
+                return sum + parseFloat(value.price);
+            }, 0) / data.prices.length;
 
             if (!curr_price) {
                 this.els.el_prev.classList.add('neon-red');
-            } else if (curr_price <= avg_price) {
+            } else if (curr_price <= this.avg_price) {
                 this.els.el_prev.classList.add('neon-green');
-            } else if (curr_price > avg_price) {
+            } else if (curr_price > this.avg_price) {
                 this.els.el_prev.classList.add('neon-yellow');
             }
         }
@@ -243,5 +285,9 @@ class Tracker {
         this.is_user = data.is_user;
         this.chart_update(data);
         this.el_data_update(data);
+    }
+
+    average(prices){
+        return prices.reduce((a, b, idx) => a + (b ? b : a/idx), 0) / prices.length;
     }
 }

@@ -20,6 +20,7 @@ let collapseList = [];
 
 
 window.addEventListener('load', function(){
+	
 	let last_update = localStorage.getItem('beta_messege_date_time') || '0';
 	last_update = new Date(last_update);
 	let curr_time = new Date();
@@ -51,7 +52,7 @@ window.addEventListener('load', function(){
 	sor[0] = sortable(drag_containers[0]);
 
 	trackers = {};
-	trackers['new'] = new Tracker(pk=9, is_user=false, is_new=true);
+	trackers['new'] = new Tracker(pk=4, is_user=false, is_new=true);
 
 	el_tracker_new.querySelector('.col-md-9').appendChild(trackers['new'].el);
 
