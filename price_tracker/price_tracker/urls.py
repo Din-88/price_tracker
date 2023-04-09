@@ -6,7 +6,6 @@ from api_profile import urls as api_profile_urls
 from api_tracker import urls as api_tracker_urls
 
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(web_urls.urlpatterns)),

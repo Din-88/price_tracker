@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from django.views import generic
+from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from dj_rest_auth.registration.views import SocialLoginView
@@ -8,7 +9,6 @@ from dj_rest_auth.registration.views import SocialConnectView
 
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from django.shortcuts import render
 
 from api_tracker.models import Tracker
 
@@ -46,10 +46,6 @@ class GoogleConnect(SocialConnectView):
 
 class Callback(generic.TemplateView):
     template_name = 'account/callback.html'
-
-
-
-from django.shortcuts import render
 
 
 def error_404_view(request, exception=None):
