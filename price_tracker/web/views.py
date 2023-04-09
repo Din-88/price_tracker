@@ -8,6 +8,7 @@ from dj_rest_auth.registration.views import SocialConnectView
 
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from django.shortcuts import render
 
 from api_tracker.models import Tracker
 
@@ -21,7 +22,7 @@ class IndexView(generic.ListView):
 
 class ProfileView(LoginRequiredMixin, generic.ListView):
     template_name = 'web/profile.html'
-    raise_exception = True
+    raise_exception = False
 
     def get_queryset(self):
         user = self.request.user
@@ -45,3 +46,11 @@ class GoogleConnect(SocialConnectView):
 
 class Callback(generic.TemplateView):
     template_name = 'account/callback.html'
+
+
+
+from django.shortcuts import render
+
+
+def error_404_view(request, exception=None):
+    return render(request, 'error_pages/404.html', status=404)
