@@ -12,3 +12,5 @@ urlpatterns = [
     path('api/', include(api_profile_urls.urlpatterns)),
     path('api/', include(api_tracker_urls.urlpatterns)),
 ]
+
+handler404 = 'web.views.error_404_view'

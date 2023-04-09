@@ -1,0 +1,25 @@
+{% extends "error_pages/base.html" %}
+
+{% block title %}Ой 404{% endblock %}
+
+{% block card_header %}
+Ошибка 404
+{% endblock %}
+
+{% block card_body %}
+{{ block.super }}
+<div class="col-12" style="position: relative;">
+    <strong>Похоже у нас нет такой страницы</strong>
+    <hr />
+</div>
+<div class="col">
+    <p class="m-0">Вы можете перейти на <a class="text-nowrap link-info" href="{% url 'index' %}">главную страницу</a> или</p>
+    <p>в ваш <a class="text-nowrap link-info" href="{% url 'profile' %}">аккаунт</a>.</p>
+    <hr class="m-0 p-0" />
+</div>
+<div class="col mt-2">
+    <p class="mb-0">
+        <a class="text-nowrap link-info" href="{% url 'account_signup' %}">Еще нет аккаунта</a>
+    </p>
+</div>
+{% endblock %}
