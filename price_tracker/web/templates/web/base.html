@@ -83,7 +83,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center align-items-lg-start">
+                        <!-- <div class="d-flex align-items-center align-items-lg-start">
                             <span>Уведомления</span>
                             <div class="d-flex my-auto tc-b-tog-d">
                                 <label class="form-label switch m-0" for="">
@@ -91,6 +91,17 @@
                                     <div class="slider round"></div>
                                 </label>
                             </div>
+                        </div> -->
+                        <div>
+                            <button class="btn tc-opt-butt text-info" type="button">
+                                <i class="icon ion-android-notifications-none text-info"></i>
+                            </button>
+                        </div>
+                        
+                        <div>
+                            <button class="btn tc-opt-butt" type="button">
+                                <i class="icon ion-android-share text-info"></i>
+                            </button>
                         </div>
                         <div>
                             <button class="btn tc-opt-butt" type="button">
@@ -118,7 +129,7 @@
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center" href="/">
                     <span class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon">
-                        <img src="{% static 'web/favicon/favicon-32x32.png' %}" alt="PT">
+                        <img src="{% static 'web/img/logo-100x100.png' %}" alt="PT" width="32px" height="32px">
                     </span>
                     <span>Price Tracker</span>
                 </a>
@@ -179,6 +190,7 @@
     <script src="{% static 'web/bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'web/js/sortable.min.js' %}"></script>
     <script src="{% static 'web/js/chart.min.js' %}"></script>
+    <script src="{% static 'web/js/html2canvas.min.js' %}"></script>
 
     <script src="{% static 'web/js/bs-init.js' %}"></script>
 

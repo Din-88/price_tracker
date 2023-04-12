@@ -160,11 +160,6 @@ const offcanvas_nav_click = (event) => {
     }
 }
 
-// var el_spinner = document.createElement("span");
-// el_spinner.classList.add('spinner-border');
-// el_spinner.classList.add('spinner-border-sm');
-// el_spinner.setAttribute('role', 'status');
-
 function t_opt_upd(el, pk) {
     Api.update(pk)
     .then((data) => {
@@ -185,10 +180,15 @@ function t_opt_730(el, pk, is_new) {
 }
 
 function t_opt_not(el, pk) {
-    Api.notify(pk, el.checked)
+    notify = !el.children[0].classList.contains('ion-android-notifications');
+    Api.notify(pk, notify)
     .then((data) => {
         el.disabled = false;
-        el.checked = data.notify;
+        if(data.notify){
+            el.children[0].className = 'ion-android-notifications';
+        } else {
+            el.children[0].className = 'ion-android-notifications-off';
+        }
         el.parentElement.classList.remove('blur');
     });   
 }
@@ -214,6 +214,17 @@ function t_opt_add(el, pk, is_new) {
                     trackers['new'].is_user = true;
                 }
             }
+        } else if (data.error.code === 'not_authenticated') {
+            let options = {
+                title: 'необходимо авторизоваться',
+                // content: 'вы должны авторизоваться',
+                trigger: 'focus',
+            }
+            const popover = new bootstrap.Popover(el, options);
+            popover.show();
+
+            setTimeout(()=>popover.dispose(), 3000);
+            let a = 0;
         }
         
         el.disabled = false;
@@ -242,6 +253,61 @@ function t_opt_del(el, pk, is_new) {
     })
 }
 
+function t_opt_share(el, pk) {
+    let modifyElementContent = (el) =>{
+        let card = el.querySelectorAll('.card')[1];
+        let labels = trackers[pk].chart.data.labels;
+        let s = labels[0].toLocaleDateString('ru-Ru');
+        let f = labels[labels.length - 1].toLocaleDateString('ru-Ru');
+        let t = `График цены с ${s} по ${f}`;
+
+        el.querySelector('.ion-arrow-move').remove();
+        card.lastElementChild.remove();
+        card.lastElementChild.remove();
+
+        el.querySelector('.tc-h-div-img>img').src="/static/web/img/logo-100x100.png";
+
+        el.querySelector('.tc-h-div-img>img').classList.remove('rounded-circle', 'neon-green');
+        el.querySelector('.tc-h-div-img>img').style = 'object-fit: contain; padding:5px';
+        el.querySelector('[date]').textContent = trackers[pk].data.host;
+
+        el.querySelector('.card-body>div>div>a').textContent = window.location.href;
+        card.lastElementChild.innerText = t;
+        card.lastElementChild.style.fontSize = '12px';
+    };
+
+    html2canvas(
+        trackers[pk].el, {
+            useCORS: true,
+            backgroundColor: null,
+            onclone: (cloneDoc, el) => {
+                modifyElementContent(el);
+            }
+        }).
+        then(function(canvas) {
+            canvas.toBlob(function(blob) {
+                let file = new File([blob], 'card.png', { type: 'image/png' });
+                navigator.share({
+                    files: [file],
+                    title: 'price-tracker.ddns.net \r\n',
+                    text: trackers[pk].data.title + ' \r\n',
+                    url: trackers[pk].data.url,
+                })
+                .then(function() {
+                    console.log('share ok');
+                })
+                .catch(function(error) {
+                    console.log('share error', error);
+                });
+            },
+            'image/png');
+        }
+    );
+
+    el.disabled = false;
+    el.parentElement.classList.remove('blur');
+}
+
 const tracker_option_actions = (event) => {
     let el = event.currentTarget;
 
@@ -257,12 +323,14 @@ const tracker_option_actions = (event) => {
             t_opt_upd(el, pk); break;
         case 'sw-d':
             t_opt_730(el, pk, is_new); break;
-        case 'sw-n':
+        case 'b-n':
             t_opt_not(el, pk); break;
         case 'b-a':
             t_opt_add(el, pk, is_new); break;
         case 'b-d':
             t_opt_del(el, pk, is_new); break;
+        case 'b-s':
+            t_opt_share(el, pk); break;
         default:
             console.log('sorry'); break;
     }

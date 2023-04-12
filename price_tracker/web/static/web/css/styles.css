@@ -232,6 +232,10 @@ main {
   transform: rotate(-90deg);
 }
 
+.btn:disabled {
+  border: none;
+}
+
 /* @media (min-width:576px) {
   .tcs-disc {
     position: absolute;

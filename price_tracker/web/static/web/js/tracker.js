@@ -28,34 +28,35 @@ class Tracker {
 
         let labels = tracker_options.querySelectorAll('label');
         this.els.el_sw_d = labels[0];
-        this.els.el_sw_n = labels[1];
 
         let post_id = `_${id}` + (is_new?'_new':'_') + (is_user?'_user':'_');
 
         this.els.el_sw_d.setAttribute('for', 'sw-d' + post_id);
-        this.els.el_sw_n.setAttribute('for', 'sw-n' + post_id);
 
         this.els.el_sw_d.children[0].id = 'sw-d' + post_id;
-        this.els.el_sw_n.children[0].id = 'sw-n' + post_id;
 
         this.els.buttons = tracker_options.querySelectorAll('button');
-        this.els.buttons[0].id = 'b-d' + post_id;
-        this.els.buttons[1].id = 'b-a' + post_id;
-        this.els.buttons[2].id = 'b-u' + post_id;
+        let b_d = this.els.buttons[0]; b_d.id = 'b-d' + post_id;
+        let b_a = this.els.buttons[1]; b_a.id = 'b-a' + post_id;
+        let b_n = this.els.buttons[2]; b_n.id = 'b-n' + post_id;
+        this.els.buttons[3].id = 'b-s' + post_id;
+        this.els.buttons[4].id = 'b-u' + post_id;
 
         if (is_user) {
-            this.els.buttons[1].classList.add('visually-hidden');
-            this.els.buttons[0].classList.remove('visually-hidden');
-            this.els.el_sw_n.children[0].checked = true;
-            this.els.el_sw_n.children[0].disabled = false;
+            b_a.classList.add('visually-hidden');
+            b_d.classList.remove('visually-hidden');
+            
+            b_n.disabled = false;
+            b_n.children[0].className = 'ion-android-notifications-off';
         } else {
-            this.els.buttons[0].classList.add('visually-hidden');
-            this.els.buttons[1].classList.remove('visually-hidden');
-            this.els.el_sw_n.children[0].checked = false;
-            this.els.el_sw_n.children[0].disabled = true;
+            b_d.classList.add('visually-hidden');
+            b_a.classList.remove('visually-hidden');
+
+            b_n.disabled = true;
+            b_n.children[0].className ='ion-android-notifications-none';
         }
 
-        return [this.els.el_sw_d.children[0], this.els.el_sw_n.children[0], ...this.els.buttons];
+        return [this.els.el_sw_d.children[0], ...this.els.buttons];
     }
 
     el_create(id, is_user=false, is_new=false) {
@@ -261,8 +262,8 @@ class Tracker {
             }
         }
 
-        if(data.hasOwnProperty('notifi')) {
-            this.els.el_sw_n.children[0].checked = data.notifi;
+        if(data.hasOwnProperty('notify')) {
+            this.els.buttons[2].children[0].className = 'ion-android-notifications';
         }
 
         this.els.el_host.href       = "https://" + data.host;
@@ -270,7 +271,7 @@ class Tracker {
         this.els.el_date.setAttribute('date', data.date_time);
         this.els.el_date.innerText  = new Date(data.date_time).toLocaleString('ru-Ru');
         this.els.el_h.innerText     = data.title;
-        this.els.el_price.innerHTML = data.price ? data.price : "None";
+        this.els.el_price.innerHTML = data.price ? `${data.price} ${data.currency}` : 'None';
         this.els.el_url.href        = data.url;
         this.els.el_url.innerText   = data.url;    
         this.els.el_prev.src        = data.img_url;
