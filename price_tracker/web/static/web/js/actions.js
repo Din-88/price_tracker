@@ -279,6 +279,7 @@ function t_opt_share(el, pk) {
     html2canvas(
         trackers[pk].el, {
             useCORS: true,
+            allowTaint: true,
             backgroundColor: null,
             onclone: (cloneDoc, el) => {
                 modifyElementContent(el);
