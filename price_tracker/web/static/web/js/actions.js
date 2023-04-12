@@ -271,7 +271,7 @@ function t_opt_share(el, pk) {
         el.querySelector('.tc-h-div-img>img').style = 'object-fit: contain; padding:5px';
         el.querySelector('[date]').textContent = trackers[pk].data.host;
 
-        el.querySelector('.card-body>div>div>a').textContent = window.location.href;
+        el.querySelector('.card-body>div>div>a').textContent = 'price-tracker.ddns.net';
         card.lastElementChild.innerText = t;
         card.lastElementChild.style.fontSize = '12px';
     };
