@@ -189,13 +189,25 @@ def task_notify_if_need_for_user(self, user_pk):
 
     user_tracker_pks = list(user_tracker_pks)
 
-    notify_cases = user.user_tracker \
-        .values('need_notify_case') \
-        .annotate(
-            count=Count('need_notify_case')
-        )
+    # notify_cases = user.user_tracker \
+    #     .filter(need_notify_types__isnull=False) \
+    #     .prefetch_related('need_notify_types') \
+    #     .values('need_notify_case', 'need_notify_types')
+        # .exclude(need_notify_case='')\
+        # .values('need_notify_case') \
+        # .annotate(
+        #     count=Count('need_notify_case')
+        # )
+
+    user = get_user_model().objects.get(pk=user_pk)
+    user_tracker_qs = user.user_tracker.filter(need_notify_types__isnull=False)
+    need_notify_types = user_tracker_qs.values_list('need_notify_types__type', flat=True).distinct()
+    need_notify_case_count = user_tracker_qs.values('need_notify_case').annotate(count=Count('need_notify_case')).order_by()
+
 
     notify_cases = list(notify_cases.all())
+    t = map(lambda x: list(x.need_notify_types.all()), notify_cases)
+    t = list(t)
     total = sum(map(lambda x: x['count'], notify_cases))
     msg = message_updated_trackers(notify_cases, total)
 

@@ -29,7 +29,7 @@ def get_plural_word(n, words):
 
 def message_updated_trackers(notify_cases, total):
     msg = f'У Вас {total} ' \
-        f'{get_plural_word(total, ["обновленный", "обновленныx", "бновленныx"])} ' \
+        f'{get_plural_word(total, ["обновленный", "обновленныx", "обновленныx"])} ' \
         f'{get_plural_word(total, ["Трекер", "Трекера", "Трекеров"])}.\r\n'
 
     messages = [msg]
