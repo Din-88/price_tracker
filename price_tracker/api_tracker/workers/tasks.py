@@ -99,8 +99,8 @@ def task_send_push(user_pk, msg):
     time_limit=20,
     soft_time_limit=10,
 )
-def task_set_need_notify(args:
-                         tuple[int, None | int | float, None | int | float]):
+def task_set_need_notify(
+    args: tuple[int, None | int | float, None | int | float]):
     '''
     Args:
         - args: tuple[
@@ -112,7 +112,7 @@ def task_set_need_notify(args:
     users = get_user_model().objects \
         .filter(trackers__pk=tracker_pk,
                 trackers_settings__notify_types__isnull=False) \
-        .prefetch_related('trackers_settings').all()
+        .prefetch_related('trackers_settings').distinct().all()
 
     for user in users:
         if curr_price == prev_price:
@@ -184,13 +184,12 @@ def task_notify_if_need_for_user(self, user_pk):
         return
 
     user_tracker_pks = user.user_tracker \
-        .filter(need_notify_types__isnull=False) \
+        .filter(need_notify_types__isnull=False).distinct() \
         .values_list('id', flat=True).all()
 
     user_tracker_pks = list(user_tracker_pks)
 
     notify_cases = user.user_tracker \
-        .filter(need_notify_types__isnull=False) \
         .values('need_notify_case') \
         .annotate(
             count=Count('need_notify_case')

@@ -54,11 +54,12 @@ class WorkersTests(TestCase):
         user_tracker.notify = True
         user_tracker.need_notify_case = ''
         user_tracker.need_notify_types \
-            .set([NotifyType.objects.get(type='push')])
+            .set([NotifyType.objects.get(type='push'),
+                  NotifyType.objects.get(type='mail')])
         user_tracker.save()
 
     def test_task_parse(self):
-        result = task_parse.apply(args=[3])
+        result = task_parse.apply(args=[self.tracker_1.pk])
         self.assertTrue(result.successful())
 
     @patch('api_tracker.workers.tasks.task_parse.s')
@@ -165,7 +166,7 @@ class WorkersTests(TestCase):
         mock_task_notify_if_need_for_user.assert_called_with(
             args=(self.user_1.pk,))
 
-    def test_task_task_clear_need_send_notify(self):
+    def test_task_clear_need_send_notify(self):
         notify_type = NotifyType.objects.filter(type='push')
         self.user_1.user_tracker.get(tracker=self.tracker_1) \
             .need_notify_types.set(notify_type)
