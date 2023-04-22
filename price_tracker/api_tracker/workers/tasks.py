@@ -2,7 +2,7 @@ from dataclasses import asdict
 from django.contrib.auth import get_user_model
 
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, F
 from urllib.parse import urlparse
 
 from django.utils import timezone
@@ -99,8 +99,8 @@ def task_send_push(user_pk, msg):
     time_limit=20,
     soft_time_limit=10,
 )
-def task_set_need_notify(args:
-                         tuple[int, None | int | float, None | int | float]):
+def task_set_need_notify(
+     args: tuple[int, None | int | float, None | int | float]):
     '''
     Args:
         - args: tuple[
@@ -112,7 +112,7 @@ def task_set_need_notify(args:
     users = get_user_model().objects \
         .filter(trackers__pk=tracker_pk,
                 trackers_settings__notify_types__isnull=False) \
-        .prefetch_related('trackers_settings').all()
+        .prefetch_related('trackers_settings').distinct().all()
 
     for user in users:
         if curr_price == prev_price:
@@ -184,37 +184,44 @@ def task_notify_if_need_for_user(self, user_pk):
         return
 
     user_tracker_pks = user.user_tracker \
-        .filter(need_notify_types__isnull=False) \
+        .filter(need_notify_types__isnull=False).distinct() \
+        .order_by('pk') \
         .values_list('id', flat=True).all()
 
     user_tracker_pks = list(user_tracker_pks)
 
-    notify_cases = user.user_tracker \
-        .filter(need_notify_types__isnull=False) \
-        .values('need_notify_case') \
-        .annotate(
-            count=Count('need_notify_case')
+    notify_cases = (
+        user.user_tracker.filter(need_notify_types__isnull=False)
+        .values('need_notify_case')
+        .annotate(count=Count('pk', distinct=True))
+    )
+
+    notify_types = user.user_tracker \
+        .filter(need_notify_types__isnull=False).distinct() \
+        .values(
+            pk=F('need_notify_types__pk'),
+            type=F('need_notify_types__type')
         )
 
     notify_cases = list(notify_cases.all())
+    notify_types = list(notify_types.all())
     total = sum(map(lambda x: x['count'], notify_cases))
     msg = message_updated_trackers(notify_cases, total)
 
-    notify_task_ids = user.trackers_settings.notify_task_ids
-    notify_task_ids = notify_task_ids.split(',')
+    notify_task_ids = user.trackers_settings.notify_task_ids.split(',')
     self.app.control.revoke(notify_task_ids)
 
     task_ids = ''
-    for notify_type in user.trackers_settings.notify_types.all():
-        if notify_type.type == 'push':
+    for notify_type in notify_types:
+        if notify_type['type'] == 'push':
             task_send = task_send_push.si(user.pk,
                                           f'Hi, {user.username}!\r\n'+msg)
-        elif notify_type.type == 'mail':
+        elif notify_type['type'] == 'mail':
             subject = 'Обновление Трекера'
             task_send = task_send_mail.si(user.pk, subject, msg)
 
         rt = (task_send | task_clear_need_notify.si(
-            user_tracker_pks, notify_type.pk)) \
+            user_tracker_pks, notify_type['pk'])) \
             .apply_async()
         task_ids += f',{rt.id}'
 
