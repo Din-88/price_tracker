@@ -35,14 +35,26 @@ class WorkersTests(TestCase):
         )
         self.user_2 = self.User.objects.create(
             username='user_2'
+        )        
+
+        NotifyType.objects.get_or_create(type='push')
+        NotifyType.objects.get_or_create(type='mail')
+
+        self.user_1.trackers_settings.notify_types.set(
+            [NotifyType.objects.get(type='push'),
+            NotifyType.objects.get(type='mail')]
         )
+
         self.tracker_1 = Tracker.objects.create(url='url_1')
         self.tracker_2 = Tracker.objects.create(url='url_2')
-        self.tracker_1.save()
+        self.tracker_3 = Tracker.objects.create(url='url_3')
+        self.tracker_4 = Tracker.objects.create(url='url_4')
         self.user_1.save()
 
         self.user_1.trackers.add(self.tracker_1)
         self.user_1.trackers.add(self.tracker_2)
+        self.user_1.trackers.add(self.tracker_3)
+        self.user_1.trackers.add(self.tracker_4)
         self.user_2.trackers.add(self.tracker_2)
 
         user_tracker = self.user_1.user_tracker.get(tracker=self.tracker_1)
@@ -53,12 +65,14 @@ class WorkersTests(TestCase):
         user_tracker = self.user_1.user_tracker.get(tracker=self.tracker_2)
         user_tracker.notify = True
         user_tracker.need_notify_case = ''
+        
         user_tracker.need_notify_types \
-            .set([NotifyType.objects.get(type='push')])
+            .set([NotifyType.objects.get(type='push'),
+                  NotifyType.objects.get(type='mail')])
         user_tracker.save()
 
     def test_task_parse(self):
-        result = task_parse.apply(args=[3])
+        result = task_parse.apply(args=[self.tracker_1.pk])
         self.assertTrue(result.successful())
 
     @patch('api_tracker.workers.tasks.task_parse.s')
@@ -103,7 +117,7 @@ class WorkersTests(TestCase):
     def test_task_set_need_notify(
          self, case, prev_price, curr_price, expected_case, expected_types):
 
-        expected_types = NotifyType.objects.filter(type='push') \
+        expected_types = self.user_1.trackers_settings.notify_types \
             if expected_types else NotifyType.objects.filter(type='empty')
 
         user_1_settings = TrackersUserSettings.objects \
@@ -131,7 +145,9 @@ class WorkersTests(TestCase):
          mock_task_send_push):
 
         task_set_need_notify((self.tracker_1.pk, 1, 2))
-        task_set_need_notify((self.tracker_2.pk, 2, 1))
+        task_set_need_notify((self.tracker_2.pk, 1, 2))
+        task_set_need_notify((self.tracker_3.pk, 2, 1))
+        task_set_need_notify((self.tracker_4.pk, 1, 1))
 
         result = task_notify_if_need_for_user \
             .apply(args=(self.user_1.pk,))
@@ -142,13 +158,16 @@ class WorkersTests(TestCase):
         mock_task_send_push.assert_called_with(
             self.user_1.pk,
             'Hi, user_1!\r\n'
-            'У Вас 2 обновленныx Трекера.\r\n'
+            'У Вас 3 обновленныx Трекера.\r\n'
             'Цена на 1 Трекер понизилась.\r\n'
-            'Цена на 1 Трекер повысилась.\r\n')
+            'Цена на 2 Трекера повысилась.\r\n')
 
         mock_clear_need_notify.assert_called_with(
             list(self.user_1.user_tracker
-                 .filter(tracker__in=[self.tracker_1, self.tracker_2])
+                 .filter(tracker__in=[self.tracker_1,
+                                      self.tracker_2,
+                                      self.tracker_3])
+                 .order_by('pk')
                  .values_list('pk', flat=True)),
             NotifyType.objects.get(type='push').pk)
 
@@ -165,7 +184,7 @@ class WorkersTests(TestCase):
         mock_task_notify_if_need_for_user.assert_called_with(
             args=(self.user_1.pk,))
 
-    def test_task_task_clear_need_send_notify(self):
+    def test_task_clear_need_send_notify(self):
         notify_type = NotifyType.objects.filter(type='push')
         self.user_1.user_tracker.get(tracker=self.tracker_1) \
             .need_notify_types.set(notify_type)
