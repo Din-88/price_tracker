@@ -18,6 +18,7 @@ if [ "$ENVIRONMENT" == "prod" ]; then
           --access-logfile -
 elif [ "$ENVIRONMENT" == "dev" ]; then
   echo "LOAD Development Environment"
+  python manage.py runscript create_superuser.py
   /bin/bash
 else
   echo "unknown environment"

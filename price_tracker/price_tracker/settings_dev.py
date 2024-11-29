@@ -19,6 +19,8 @@ TEST_RUNNER = [
 
 SITE_ID = 1
 
+SESSION_COOKIE_SECURE = False
+
 # ACCOUNT_AUTHENTICATION_METHOD (="username" | "email" | "username_email")
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 

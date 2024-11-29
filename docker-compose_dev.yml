@@ -50,9 +50,9 @@ services:
 networks:
   nginx_proxy_net:
     name: nginx_proxy_net
-    external: true
+    external: false
 
 volumes:
   pt_static:
     name: pt_static
-    external: true
+    external: false

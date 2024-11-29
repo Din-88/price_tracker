@@ -63,7 +63,7 @@ AUTH_USER_MODEL = 'api_profile.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.TokenAuthentication',s
     ],
