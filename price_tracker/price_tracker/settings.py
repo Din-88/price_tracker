@@ -11,7 +11,7 @@ if platform.system() == 'Windows':
     load_dotenv('./../.env.dev', override=True)
 
 
-DEBUG = True
+DEBUG = False
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
