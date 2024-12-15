@@ -11,7 +11,7 @@ if platform.system() == 'Windows':
     load_dotenv('./../.env.dev', override=True)
 
 
-DEBUG = False
+DEBUG = True
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
@@ -25,7 +25,7 @@ CSRF_TRUSTED_ORIGINS = ['https://price-tracker.ddns.net']
 
 APPEND_SLASH = True
 
-SITE_ID = 2
+SITE_ID = 1
 
 
 INSTALLED_APPS = [

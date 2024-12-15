@@ -8,7 +8,7 @@ export DJANGO_LOG_LEVEL=INFO
 
 if [ "$ENVIRONMENT" == "prod" ]; then
   echo "LOAD Production Environment"  
-  # python manage.py makemigrations --noinput
+  python manage.py makemigrations --noinput
   python manage.py migrate --noinput
   python manage.py collectstatic --noinput
 
