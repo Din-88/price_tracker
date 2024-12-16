@@ -166,7 +166,7 @@ class BaseSoupParser(BaseParser):
 
 
 class BaseJSONParser(BaseParser, ABC):
-    def create_info(self) -> bool:
+    def create_info(self, *args, **kwargs) -> bool:
         response = self.get_response(self.url)
         if response is None:
             return False
@@ -175,7 +175,7 @@ class BaseJSONParser(BaseParser, ABC):
         except Exception:
             return False
 
-        if not self.scraping_info(data=json):
+        if not self.scraping_info(data=json, *args, **kwargs):
             return False
         return True
 
@@ -273,7 +273,7 @@ class ShopKz(BaseSoupParser):
 
 
 class WildberriesKz(BaseJSONParser):
-    host = 'global.wildberries.ru'
+    host = 'global.wildberriess.ru'
 
     def create_info(self) -> bool:
         url = "https://card.wb.ru/cards/detail"
@@ -342,6 +342,54 @@ class WildberriesKzAspx(WildberriesKz):
     #     card = self.url.split('/')[-2]
     #     self.url = f'https://global.wildberries.ru/product?card={card}'
     #     return super().create_info()
+
+
+class GlobalWildberriesRu(BaseJSONParser):
+    host = 'global.wildberries.ru'
+    # https://global.wildberries.ru/product/noutbuk-igrovoj-thin-a15-b7uc-405xru-9s7-16rk11-405-283118104?option=433985712
+
+    def create_info(self):
+        url = 'https://card.wb.ru/cards/v2/detail?appType=128&curr=kzt&lang=ru&dest=-1257786&spp=30&nm='
+
+        url_parse = urlparse(self.url)
+        nm = url_parse.path.split('-')[-1]
+        self.url = url+nm
+        super().create_info(nm=nm)
+        pass
+
+
+    def scraping_info(self, data, nm = ''):
+
+        if len(nm) == 8:
+            vol = nm[:4]
+            part = nm[:6]
+        if len(nm) == 9:
+            vol = nm[:5]
+            part = nm[:7]
+
+        response = self.get_response('https://cdn.wbbasket.ru/api/v3/upstreams?schema=https')
+        if response is None:
+            return False
+        try:
+            json = response.json()
+        except Exception:
+            return False
+        
+        host = json['origin']['mediabasket_route_map'][0]['hosts']
+
+        j = i for i in host if i['vol_range_from'] >= vol and i['vol_range_to'] <= vol
+
+        #self.img_url = f''    vol2831/part283118/283118104
+        try:
+            self.title   = data['data']['products'][0]['name']
+            self.price   = data['data']['products'][0]['salePriceU']/100
+            self.currency = '₸'
+        except Exception:
+            return False
+        return True
+
+
+
 
 
 class OlxKz(BaseSoupParser):

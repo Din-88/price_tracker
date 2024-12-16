@@ -6,6 +6,7 @@ from .parsers import (
     ShopKz,
     WildberriesKz,
     WildberriesKzAspx,
+    GlobalWildberriesRu,
     OlxKz,
     Parsers,
     Info,
@@ -77,6 +78,17 @@ class Test_TestWildberriesKzAspx(unittest.TestCase):
         info = WildberriesKzAspx(url=url).get_info()
 
         self.assertIsInstance(info, Info)
+
+
+class Test_TestGlobalWildberriesRu(unittest.TestCase):
+
+    def test_get_info(self):
+        url = 'https://global.wildberries.ru/product/noutbuk-igrovoj-thin-a15-b7uc-405xru-9s7-16rk11-405-283118104?option=433985712'
+
+        info = GlobalWildberriesRu(url=url).get_info()
+
+        self.assertIsInstance(info, Info)
+
 
 
 class Test_TestOlxKz(unittest.TestCase):
