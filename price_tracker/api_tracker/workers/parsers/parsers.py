@@ -112,7 +112,7 @@ class BaseParser(ABC):
                 time.sleep(1)
             except ReadTimeout:
                 time.sleep(1)
-            except Exception:
+            except Exception as inst:
                 time.sleep(1)
         return None
 
@@ -194,19 +194,18 @@ class Sulpak(BaseSoupParser):
     host = 'www.sulpak.kz'
 
     def scraping_info(self, data: BeautifulSoup) -> bool:
-        soup = data
-
-        product_wraper = soup.find(name='div', class_='product__main-wrapper')
-        elem_img   = product_wraper.find(name='img')
-        elem_price = product_wraper.find(name='div', class_='product__price')
+        product_info = data.find_all(name='script', type='application/ld+json')[1]
+        product_info = json.loads( product_info.text.replace('\n', ''))
 
         try:
-            self.img_url  = elem_img.attrs['src']
-            self.title    = elem_img.attrs['title']
-            self.price    = re.findall('[0-9]+', elem_price.text)
-            self.price    = ''.join(self.price)
-            self.price    = float(self.price)
-            self.currency = elem_price.text[-1]
+            self.img_url = product_info['image']
+            self.title   = product_info['name']
+            self.price   = product_info['offers']['price']
+            available    = True if product_info['offers']['availability'] == 'https://schema.org/InStock' else False
+            self.currency = '₸'
+
+            if self.price != 'null':
+                self.price = float(self.price)
         except:
             return False
         return True
@@ -218,34 +217,19 @@ class Technodom(BaseSoupParser):
     def scraping_info(self, data: BeautifulSoup) -> bool:
         soup = data
 
-        product_info = soup.find(name='div',
-                                 class_='Product_block__wrapper__pPWI_')
-        elem_title = product_info.find(name='h1')
-        elem_img   = product_info.find(name='li', class_="slide selected") \
-                                 .find(name='img')
-        elem_price = product_info.find(name='p',
-             class_='Typography Typography__Heading Typography__Heading_H1')
-        
-        if not elem_price:
-            elem_price = product_info.find(name='p',
-             class_='Typography --accented Typography__Heading Typography__Heading_H1')
-
-        if not elem_price:
-             self.price = None
-             return True
+        product_info = data.find_all(name='script', type='application/ld+json')[0]
+        product_info = json.loads( product_info.text.replace('\n', ''))
 
         try:
-            self.img_url  = elem_img.attrs['src']
-            self.img_url  = f'https://{self.host}{self.img_url}'
-            self.title    = elem_title.text
-            if elem_price:
-                self.price = elem_price.text.replace(u'\xa0', '')[0:-1]
-                self.price = float(self.price)
-                self.currency = elem_price.text[-1]
-            else:
-                self.price = None
+            self.img_url = product_info['image'][0][0]
+            self.title   = product_info['name']
+            self.price   = product_info['offers']['price']
+            available    = True if product_info['offers']['availability'] == 'https://schema.org/InStock' else False
             self.currency = '₸'
-        except Exception:
+
+            if self.price != 'null':
+                self.price = float(self.price)
+        except:
             return False
         return True
 
@@ -255,13 +239,13 @@ class ShopKz(BaseSoupParser):
 
     def scraping_info(self, data: BeautifulSoup) -> bool: 
 
-        product_info = data.find(name='div', class_='bx_item_detail bx_blue')
-        product_info = json.loads(product_info.attrs['data-product'])
+        product_info = data.find_all(name='script', type='application/ld+json')[1]
+        product_info = json.loads( product_info.text.replace('\n', ''))
         
-        self.img_url = product_info['image']
-        self.title   = product_info['item_name'].replace(u'&quot;,', '')
-        self.price   = product_info['price']
-        available    = product_info['dimension3']
+        self.img_url = product_info['image'][0]
+        self.title   = product_info['name']
+        self.price   = product_info['offers']['price']
+        available    = True if product_info['offers']['availability'] == 'https://schema.org/InStock' else False
         self.currency = '₸'
 
         if self.price != 'null':
@@ -272,100 +256,31 @@ class ShopKz(BaseSoupParser):
         return True
 
 
-class WildberriesKz(BaseJSONParser):
-    host = 'global.wildberriess.ru'
-
-    def create_info(self) -> bool:
-        url = "https://card.wb.ru/cards/detail"
-
-        query_list = self.url.split('?')[1].split('&')
-        card = query_list[0].split('=')[1]
-
-        querystring = {
-            "appType": "128",
-            "curr": "kzt",
-            "locale": "kz",
-            "lang": "ru",
-            # "dest":"-1029256,-102269,-2162196,-1257786",
-            # "regions":"1,4,22,30,31,33,38,40,48,64,66,68,69,70,71,75,80,83",
-            "emp": "0",
-            "reg": "1",
-            "pricemarginCoeff": "1.0",
-            "offlineBonus": "0",
-            "onlineBonus": "0",
-            "spp": "0",
-            "nm": f"{card}"
-        }
-
-        response = self.get_response(url=url, params=querystring)
-
-        if response is None:
-            return False
-        try:
-            json = response.json()
-        except Exception:
-            return False
-
-        if not self.scraping_info(json, card):
-            return False
-        return True
-
-    def scraping_info(self, data, card) -> bool:
-        at = [143, 287, 431, 719, 1007, 1061, 1115, 1169, 1313, 1601]
-
-        t = int(card)
-        n = math.floor(t/1e5)
-        p = math.floor(t/1e3)
-        a = next(idx for idx, x in enumerate(at) if n <= x) + 1
-        img_url = f'https://basket-{a:0>2}.wb.ru/vol{n}/part{p}/{card}/images/c246x328/1.jpg'
-
-        try:
-            self.img_url = img_url
-            self.title   = data['data']['products'][0]['name']
-            self.price   = data['data']['products'][0]['salePriceU']/100
-            self.currency = '₸'
-        except Exception:
-            return False
-        return True
-
-
-class WildberriesKzAspx(WildberriesKz):
-    host = 'kz.wildberries.ru'
-    url = 'https://kz.wildberries.ru/catalog/55919141/detail.aspx'
-
-    def __init__(self, url: str = '') -> None:
-        card = self.url.split('/')[-2]
-        url = f'https://global.wildberries.ru/product?card={card}'
-        super().__init__(url=url)
-
-    # def create_info(self) -> bool:
-    #     card = self.url.split('/')[-2]
-    #     self.url = f'https://global.wildberries.ru/product?card={card}'
-    #     return super().create_info()
-
-
 class GlobalWildberriesRu(BaseJSONParser):
     host = 'global.wildberries.ru'
     # https://global.wildberries.ru/product/noutbuk-igrovoj-thin-a15-b7uc-405xru-9s7-16rk11-405-283118104?option=433985712
+    # https://card.wb.ru/cards/v2/detail?appType=128&curr=kzt&lang=ru&dest=123589446&spp=30&nm=283118104
 
     def create_info(self):
-        url = 'https://card.wb.ru/cards/v2/detail?appType=128&curr=kzt&lang=ru&dest=-1257786&spp=30&nm='
+        url = 'https://card.wb.ru/cards/v2/detail?appType=128&curr=kzt&lang=ru&dest=123589446&spp=30&nm='
 
         url_parse = urlparse(self.url)
         nm = url_parse.path.split('-')[-1]
         self.url = url+nm
-        super().create_info(nm=nm)
-        pass
+        return super().create_info(nm=nm)
 
 
-    def scraping_info(self, data, nm = ''):
+    def scraping_info(self, data, nm=''):
 
         if len(nm) == 8:
+            vol = nm[:3]
+            part = nm[:5]
+        if len(nm) == 9:
             vol = nm[:4]
             part = nm[:6]
-        if len(nm) == 9:
-            vol = nm[:5]
-            part = nm[:7]
+
+        vol = int(vol)
+        part = int(part)
 
         response = self.get_response('https://cdn.wbbasket.ru/api/v3/upstreams?schema=https')
         if response is None:
@@ -375,21 +290,22 @@ class GlobalWildberriesRu(BaseJSONParser):
         except Exception:
             return False
         
-        host = json['origin']['mediabasket_route_map'][0]['hosts']
+        hosts = json['origin']['mediabasket_route_map'][0]['hosts']
 
-        j = i for i in host if i['vol_range_from'] >= vol and i['vol_range_to'] <= vol
+        j = next(
+            (host for host in hosts if host["vol_range_from"] <= vol <= host["vol_range_to"]),
+            None)
 
-        #self.img_url = f''    vol2831/part283118/283118104
+        # https://basket-17.wbbasket.ru/vol2831/part283118/283118104/images/big/2.webp
+        self.img_url = f'{j["host"]}/vol{vol}/part{part}/{nm}/images/big/2.webp'
+        
         try:
             self.title   = data['data']['products'][0]['name']
-            self.price   = data['data']['products'][0]['salePriceU']/100
+            self.price   = data['data']['products'][0]['sizes'][0]['price']['total']/100
             self.currency = '₸'
         except Exception:
             return False
         return True
-
-
-
 
 
 class OlxKz(BaseSoupParser):
@@ -425,20 +341,21 @@ class OlxKz(BaseSoupParser):
 
 class AlserKz(BaseJSONParser):
     host = 'alser.kz'
-
+    
+    #https://alser.kz/p/rb33a32n0elwtholodilnik-samsung
     def get_response(self, url=''):
         keyword = self.url.split('/')[-1]
-        url = f'https://alser.kz/api/products/detail?keyword={keyword}'
+        url = f'https://alser.kz/api/v2/product-detail?keyword={keyword}'
         response = super().get_response(url=url)
         return response
 
     def scraping_info(self, data: Any = None) -> bool:
-        if not data.get('message') == 'OK':
+        if not data.get('message') == 'mobapi':
             return False
-        if not data.get('data', {}).get('data'):
+        if not data.get('data', {}):
             return False
 
-        data = data['data']['data']
+        data = data.get('data')
 
         self.title = data.get('title')
         self.img_url = data.get('photos')[0]
@@ -453,12 +370,14 @@ class AlserKz(BaseJSONParser):
 
 
 class ObyavleniyaKaspiKz(BaseSoupParser):
-    host = 'obyavleniya.kaspi.kz'  # market.kz
+    host = 'obyavleniya.kaspi.kz'
 
     def scraping_info(self, data: BeautifulSoup) -> bool:
 
-        el_img_url = data.find(name='picture', class_='slider__picture')
-        el_img_url = el_img_url.find(name='source', type='image/jpeg')
+        #el_img_url = data.find(name='picture', class_='slider__picture')
+       # el_img_url = el_img_url.find(name='source', type='image/jpeg')
+
+        el_img_url = data.xpath('//*[@id="splide01-slide01"]/picture')
 
         self.img_url = el_img_url.attrs['srcset'].split(',')[0][:-3]
 
@@ -578,7 +497,7 @@ class KrishaKz(BaseSoupParser):
     host = 'krisha.kz'
 
     def scraping_info(self, data: BeautifulSoup) -> bool:
-        product_info = data.select('#jsdata')[0].text[20:-6]
+        product_info = data.select('#jsdata')[0].text[23:-6]
         product_info = json.loads(product_info)
         
         self.img_url  = product_info['advert']['photos'][0]['src']

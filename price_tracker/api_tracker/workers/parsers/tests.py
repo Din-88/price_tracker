@@ -4,8 +4,6 @@ from .parsers import (
     Sulpak,
     Technodom,
     ShopKz,
-    WildberriesKz,
-    WildberriesKzAspx,
     GlobalWildberriesRu,
     OlxKz,
     Parsers,
@@ -31,7 +29,7 @@ class Test_TestParsers(unittest.TestCase):
 class Test_TestSulpak(unittest.TestCase):
 
     def test_get_info(self):
-        url = 'https://www.sulpak.kz/g/strujniyj_mfu_epson_l3101'
+        url = 'https://www.sulpak.kz/g/veb_kamera_logitech_s270_960_000636'
         info = Sulpak(url=url).get_info()
 
         self.assertIsInstance(info, Info)
@@ -40,9 +38,7 @@ class Test_TestSulpak(unittest.TestCase):
 class Test_TestTechnodom(unittest.TestCase):
 
     def test_get_info(self):
-        url = 'https://www.technodom.kz/uralsk/p/smartfon-gsm-samsung-galaxy-a13-64gb-black-258737?recommended_by=dynamic&recommended_code=z9wxnh4hkr'
-        url = 'https://www.technodom.kz/p/noutbuk-156-neo-55257u-8-256-w-wh15u-i5-v1-226869?recommended_by=dynamic&recommended_code=z9wxnh4hkr'
-        url = 'https://www.technodom.kz/p/televizor-samsung-50-ue50au7100uxce-led-uhd-smart-titan-gray-242364?recommended_by=dynamic&recommended_code=z9wxnh4hkr'
+        url = 'https://www.technodom.kz/p/noutbuk-16-huawei-matebook-d16-mitchellf-w5651-277009?recommended_by=dynamic&recommended_code=z9wxnh4hkr'
 
         info = Technodom(url=url).get_info()
 
@@ -52,30 +48,8 @@ class Test_TestTechnodom(unittest.TestCase):
 class Test_TestShopKz(unittest.TestCase):
 
     def test_get_info(self):
-        url = 'https://shop.kz/offer/vneshniy-zhestkiy-disk-1000gb-2-5-apacer-ac233-black/'
+        url = 'https://shop.kz/offer/mysh-asus-p714-rog-keris-ii-wl-ace-white/'
         info = ShopKz(url=url).get_info()
-
-        self.assertIsInstance(info, Info)
-
-
-class Test_TestWildberriesKz(unittest.TestCase):
-
-    def test_get_info(self):
-        url = 'https://kz.wildberries.ru/product?card=10330269&category=303'
-        url = 'https://kz.wildberries.ru/product?card=17094328'
-        url = 'https://kz.wildberries.ru/product?card=114629100'
-
-        info = WildberriesKz(url=url).get_info()
-
-        self.assertIsInstance(info, Info)
-
-
-class Test_TestWildberriesKzAspx(unittest.TestCase):
-
-    def test_get_info(self):
-        url = 'https://kz.wildberries.ru/catalog/55919141/detail.aspx'
-
-        info = WildberriesKzAspx(url=url).get_info()
 
         self.assertIsInstance(info, Info)
 
@@ -116,7 +90,7 @@ class Test_TestAlserKz(unittest.TestCase):
 class Test_ObyavleniyaKaspiKz(unittest.TestCase):
 
     def test_get_info(self):
-        url = 'https://market.kz/a/prodam-sistemnyiy-blok-109093743/'
+        url = 'https://obyavleniya.kaspi.kz/a/seagate-skyhawk-1tb-15000-20000k-116702726'
         info = ObyavleniyaKaspiKz(url=url).get_info()
 
         self.assertIsInstance(info, Info)
@@ -135,8 +109,7 @@ class Test_KaspiKz(unittest.TestCase):
 class Test_TestKolesaKz(unittest.TestCase):
 
     def test_get_info(self):
-        # url = 'https://kolesa.kz/a/show/138930595'
-        url = 'https://kolesa.kz/a/show/145558514'
+        url = 'https://kolesa.kz/a/show/180533208'
         info = KolesaKz(url=url).get_info()
 
         self.assertIsInstance(info, Info)
@@ -145,7 +118,7 @@ class Test_TestKolesaKz(unittest.TestCase):
 class Test_TestKrishaKz(unittest.TestCase):
 
     def test_get_info(self):
-        url = 'https://krisha.kz/a/show/680055827'
+        url = 'https://krisha.kz/a/show/691035302'
         info = KrishaKz(url=url).get_info()
 
         self.assertIsInstance(info, Info)
