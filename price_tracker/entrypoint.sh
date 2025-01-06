@@ -7,7 +7,8 @@ export DJANGO_LOG_LEVEL=INFO
 
 
 if [ "$ENVIRONMENT" == "prod" ]; then
-  echo "LOAD Production Environment"  
+  echo "LOAD Production Environment"
+
   python manage.py makemigrations --noinput
   python manage.py migrate --noinput
   python manage.py collectstatic --noinput
@@ -18,7 +19,16 @@ if [ "$ENVIRONMENT" == "prod" ]; then
           --access-logfile -
 elif [ "$ENVIRONMENT" == "dev" ]; then
   echo "LOAD Development Environment"
-  python manage.py runscript create_superuser.py
+  
+  if [ "$CLEAR_START" == "True" ]; then
+    echo "Clearing the database"
+
+    python manage.py dumpdata --natural-foreign --natural-primary --indent 2 > db.json
+    python manage.py flush --noinput
+    python manage.py loaddata db_clear.json
+
+    python create_superuser.py
+  fi
   /bin/bash
 else
   echo "unknown environment"

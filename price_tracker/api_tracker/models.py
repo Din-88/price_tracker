@@ -77,7 +77,7 @@ class TrackersUserSettings(models.Model):
 
 class Tracker(models.Model):
 
-    url = models.CharField(max_length=255, unique=False)
+    url = models.CharField(max_length=255, unique=True)
     host = models.CharField(
         max_length=255, unique=False,
         null=True, blank=True)
