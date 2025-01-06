@@ -8,8 +8,7 @@ from django.contrib.auth import get_user_model
 from api_tracker.models import (
     Tracker, Price, NotifyCase, NotifyType,
     TrackersUserSettings,
-    UserTracker,
-    NotifyType,
+    UserTracker
 )
 
 from .tasks import (
@@ -29,16 +28,21 @@ from .utils import message_updated_trackers
 
 class WorkersTests(TestCase):
     def setUp(self):
-        self.User = get_user_model()
-        self.user_1 = self.User.objects.create(
-            username='user_1'
-        )
-        self.user_2 = self.User.objects.create(
-            username='user_2'
-        )        
 
         NotifyType.objects.get_or_create(type='push')
         NotifyType.objects.get_or_create(type='mail')
+
+        NotifyCase.objects.get_or_create(case='>')
+        NotifyCase.objects.get_or_create(case='<')
+        NotifyCase.objects.get_or_create(case='<>')
+
+        self.User = get_user_model()
+        self.user_1, _ = self.User.objects.get_or_create(
+            username='user_1'
+        )
+        self.user_2, _ = self.User.objects.get_or_create(
+            username='user_2'
+        )
 
         self.user_1.trackers_settings.notify_types.set(
             [NotifyType.objects.get(type='push'),
@@ -161,15 +165,15 @@ class WorkersTests(TestCase):
             'У Вас 3 обновленныx Трекера.\r\n'
             'Цена на 1 Трекер понизилась.\r\n'
             'Цена на 2 Трекера повысилась.\r\n')
+        
+        pks = list(self.user_1.user_tracker.filter(
+            tracker__in=[self.tracker_1, self.tracker_2, self.tracker_3])
+            .order_by('pk')
+            .values_list('pk', flat=True))
+        
+        pk = NotifyType.objects.get(type='mail').pk
 
-        mock_clear_need_notify.assert_called_with(
-            list(self.user_1.user_tracker
-                 .filter(tracker__in=[self.tracker_1,
-                                      self.tracker_2,
-                                      self.tracker_3])
-                 .order_by('pk')
-                 .values_list('pk', flat=True)),
-            NotifyType.objects.get(type='push').pk)
+        mock_clear_need_notify.assert_called_with(pks, pk)
 
     @patch('api_tracker.workers.tasks.task_notify_if_need_for_user.apply_async')
     def test_task_notify_if_need(
