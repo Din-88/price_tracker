@@ -4,6 +4,7 @@ from .parsers import (
     Sulpak,
     Technodom,
     ShopKz,
+    WildberriesRu,
     GlobalWildberriesRu,
     OlxKz,
     Parsers,
@@ -54,6 +55,16 @@ class Test_TestShopKz(unittest.TestCase):
         self.assertIsInstance(info, Info)
 
 
+class Test_TestWildberriesRu(unittest.TestCase):
+
+    def test_get_info(self):
+        url = 'https://www.wildberries.ru/catalog/242981772/detail.aspx'
+
+        info = WildberriesRu(url=url).get_info()
+
+        self.assertIsInstance(info, Info)
+
+
 class Test_TestGlobalWildberriesRu(unittest.TestCase):
 
     def test_get_info(self):
@@ -62,7 +73,6 @@ class Test_TestGlobalWildberriesRu(unittest.TestCase):
         info = GlobalWildberriesRu(url=url).get_info()
 
         self.assertIsInstance(info, Info)
-
 
 
 class Test_TestOlxKz(unittest.TestCase):

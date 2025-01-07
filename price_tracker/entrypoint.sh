@@ -21,12 +21,18 @@ elif [ "$ENVIRONMENT" == "dev" ]; then
   echo "LOAD Development Environment"
   
   if [ "$CLEAR_START" == "True" ]; then
-    echo "Clearing the database"
+    echo "Creating database"
+    python manage.py makemigrations --noinput
+    python manage.py migrate --noinput
+    python manage.py collectstatic --noinput
+
+    echo "Clearing database"
 
     python manage.py dumpdata --natural-foreign --natural-primary --indent 2 > db.json
-    python manage.py flush --noinput
+    #python manage.py flush --noinput
     python manage.py loaddata db_clear.json
 
+    echo "Creating SuperUser"
     python create_superuser.py
   fi
   /bin/bash
@@ -34,5 +40,3 @@ else
   echo "unknown environment"
   /bin/bash
 fi
-
-

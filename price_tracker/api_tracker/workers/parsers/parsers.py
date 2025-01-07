@@ -167,7 +167,8 @@ class BaseSoupParser(BaseParser):
 
 class BaseJSONParser(BaseParser, ABC):
     def create_info(self, *args, **kwargs) -> bool:
-        response = self.get_response(self.url)
+        url = kwargs.get('url', None)
+        response = self.get_response(url=url)
         if response is None:
             return False
         try:
@@ -256,22 +257,25 @@ class ShopKz(BaseSoupParser):
         return True
 
 
-class GlobalWildberriesRu(BaseJSONParser):
-    host = 'global.wildberries.ru'
-    # https://global.wildberries.ru/product/noutbuk-igrovoj-thin-a15-b7uc-405xru-9s7-16rk11-405-283118104?option=433985712
-    # https://card.wb.ru/cards/v2/detail?appType=128&curr=kzt&lang=ru&dest=123589446&spp=30&nm=283118104
+class WildberriesRu(BaseJSONParser):
+    host = 'www.wildberries.ru'
+    # https://www.wildberries.ru/catalog/242981772/detail.aspx
+    def create_info(self, nm=''):
+        if not nm:
+            url_parse = urlparse(self.url)
+            nm = url_parse.path.split('/')[-2]
 
-    def create_info(self):
-        url = 'https://card.wb.ru/cards/v2/detail?appType=128&curr=kzt&lang=ru&dest=123589446&spp=30&nm='
+        destination = [-1257786, 123589446]
 
-        url_parse = urlparse(self.url)
-        nm = url_parse.path.split('-')[-1]
-        self.url = url+nm
-        return super().create_info(nm=nm)
+        for dest in destination:
+            url = f'https://card.wb.ru/cards/v2/detail?appType=128&curr=kzt&lang=ru&dest={dest}&spp=30&nm={nm}'
+            if super().create_info(url=url, nm=nm):
+                return True
+        return False
 
 
-    def scraping_info(self, data, nm=''):
-
+    def scraping_info(self, data, *args, **kwargs):
+        nm = kwargs.get('nm')
         if len(nm) == 8:
             vol = nm[:3]
             part = nm[:5]
@@ -297,7 +301,7 @@ class GlobalWildberriesRu(BaseJSONParser):
             None)
 
         # https://basket-17.wbbasket.ru/vol2831/part283118/283118104/images/big/2.webp
-        self.img_url = f'{j["host"]}/vol{vol}/part{part}/{nm}/images/big/2.webp'
+        self.img_url = f'{j["host"]}/vol{vol}/part{part}/{nm}/images/big/1.webp'
         
         try:
             self.title   = data['data']['products'][0]['name']
@@ -306,6 +310,18 @@ class GlobalWildberriesRu(BaseJSONParser):
         except Exception:
             return False
         return True
+
+
+class GlobalWildberriesRu(WildberriesRu):
+    host = 'global.wildberries.ru'
+    # https://global.wildberries.ru/product/noutbuk-igrovoj-thin-a15-b7uc-405xru-9s7-16rk11-405-283118104?option=433985712
+    # https://card.wb.ru/cards/v2/detail?appType=128&curr=kzt&lang=ru&dest=123589446&spp=30&nm=283118104
+
+    def create_info(self):
+        url_parse = urlparse(self.url)
+        nm = url_parse.path.split('-')[-1]
+
+        return super().create_info(nm=nm)
 
 
 class OlxKz(BaseSoupParser):
