@@ -12,6 +12,25 @@ x-logging:
     mode: "non-blocking"
 
 services:
+  nginx:
+    container_name:
+      pt_nginx
+    build:
+      ./nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/sites-enabled/:/etc/nginx/sites-enabled/
+      - ./logs/nginx/:/var/log/nginx/
+      - pt_static:/usr/share/nginx/html/price-tracker/static/
+      - /etc/letsencrypt/live/price-tracker.ddns.net:/etc/nginx/ssl/live/price-tracker.ddns.net
+    depends_on:
+      - postgres
+      - price_tracker
+    restart: 
+      unless-stopped
+
   postgres:
     container_name: pt_postgres
     build:
@@ -59,7 +78,7 @@ services:
 
   price_tracker:
     container_name:
-      price_tracker      
+      pt_price_tracker      
     # user: "${PT_UID}:${PT_GID}"
     build:
       ./price_tracker

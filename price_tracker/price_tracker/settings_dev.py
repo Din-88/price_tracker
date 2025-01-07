@@ -17,7 +17,9 @@ TEST_RUNNER = [
     'djcelery.contrib.test_runner.CeleryTestSuiteRunner',
 ]
 
-SITE_ID = 1
+SITE_ID = 2
+
+SESSION_COOKIE_SECURE = False
 
 # ACCOUNT_AUTHENTICATION_METHOD (="username" | "email" | "username_email")
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'

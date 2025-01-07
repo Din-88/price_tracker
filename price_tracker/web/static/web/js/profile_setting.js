@@ -97,7 +97,7 @@ class Account {
                 } else {
                     b.innerText = 'Редактировать';
                     b.type='reset';
-                    form = b.parentElement.parentElement;
+                    // form = b.parentElement.parentElement;
                     fieldset.disabled = true;
                 }        
             });
