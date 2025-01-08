@@ -23,6 +23,7 @@ services:
     volumes:
       - ./nginx/sites-enabled/:/etc/nginx/sites-enabled/
       - ./logs/nginx/:/var/log/nginx/
+      - ./nginx/html/googleb4370e9bcc31fe47.html:/usr/share/nginx/html/price-tracker/googleb4370e9bcc31fe47.html
       - pt_static:/usr/share/nginx/html/price-tracker/static/
       - /etc/letsencrypt/live/price-tracker.ddns.net:/etc/nginx/ssl/live/price-tracker.ddns.net
     depends_on:
