@@ -265,7 +265,7 @@ class WildberriesRu(BaseJSONParser):
             url_parse = urlparse(self.url)
             nm = url_parse.path.split('/')[-2]
 
-        destination = [-1257786, 123589446]
+        destination = [123589446, -1257786]
 
         for dest in destination:
             url = f'https://card.wb.ru/cards/v2/detail?appType=128&curr=kzt&lang=ru&dest={dest}&spp=30&nm={nm}'

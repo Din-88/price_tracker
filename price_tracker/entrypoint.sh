@@ -9,10 +9,25 @@ export DJANGO_LOG_LEVEL=INFO
 if [ "$ENVIRONMENT" == "prod" ]; then
   echo "LOAD Production Environment"
 
+  echo "Creating database"
   python manage.py makemigrations --noinput
   python manage.py migrate --noinput
+
+  if [ "$CLEAR_START" == "True" ]; then
+    echo "Clearing database"
+
+    python manage.py dumpdata --natural-foreign --natural-primary --indent 2 > db.json
+    #python manage.py flush --noinput
+    python manage.py loaddata db_clear.json
+
+    echo "Creating SuperUser"
+    python create_superuser.py
+  fi
+
+  echo "Collecting static"
   python manage.py collectstatic --noinput
 
+  echo "Starting Gunicorn"
   exec gunicorn price_tracker.wsgi:application \
           --bind 0.0.0.0:8080 \
           --workers 2 \

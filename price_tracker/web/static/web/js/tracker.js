@@ -270,7 +270,7 @@ class Tracker {
         this.els.el_date.setAttribute('date', data.date_time);
         this.els.el_date.innerText  = new Date(data.date_time).toLocaleString('ru-Ru');
         this.els.el_h.innerText     = data.title;
-        this.els.el_price.innerHTML = data.price ? data.price : "None";
+        this.els.el_price.innerHTML = data.price ? parseInt(data.price) + " тг." : "None";
         this.els.el_url.href        = data.url;
         this.els.el_url.innerText   = data.url;    
         this.els.el_prev.src        = data.img_url;
